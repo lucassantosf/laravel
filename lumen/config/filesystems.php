@@ -54,10 +54,10 @@ return [
         ],
         's3' => [
             'driver' => 's3',
-            'key'    => 'AKIAU6UR6VBADUGG4I7Z',
-            'secret' => '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',
-            'region' => 'sa-east-1',
-            'bucket' => 'yetz-now',
+            'key'    => '',
+            'secret' => '',
+            'region' => '',
+            'bucket' => '',
         ],
     ],
 
