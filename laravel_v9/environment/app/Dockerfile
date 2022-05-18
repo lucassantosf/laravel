@@ -1,9 +1,7 @@
 FROM php:7.4-fpm
+MAINTAINER Lucas Santos
 
-#COPY ./yetz-cron /etc/cron.d/yetz-cron
-#RUN chmod 0644 /etc/cron.d/yetz-cron
-
-RUN apt update && apt install -y libzip-dev libpng-dev zip cron nano
+RUN apt update && apt install -y libzip-dev libpng-dev zip
 
 RUN docker-php-ext-install tokenizer mysqli pdo_mysql zip gd
 
@@ -15,7 +13,7 @@ RUN useradd -u 1000 -ms /bin/bash -g www www
 COPY . /var/www/html
 COPY --chown=www:www . /var/www/html
 
-COPY ./start.sh /usr/local/bin/start
+COPY /environment/app/start.sh /usr/local/bin/start
 RUN chmod +x /usr/local/bin/start
 
 USER www
