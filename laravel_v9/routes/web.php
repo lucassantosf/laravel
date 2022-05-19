@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\ExampleJob;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +17,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('users', function () {
+    return User::all();
+});
+
+Route::get('create-job', function () {
+    // dispatch(new ExampleJob('lucas','lucas@gmail.com','123456'));
+    ExampleJob::dispatch('lucas','lucas@gmail.com','123456');
+    return 'created';
 });

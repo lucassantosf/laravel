@@ -27,7 +27,7 @@ services:
     container_name: app
     volumes:
       - ./:/var/www/html
-    working_dir: /var/www/html/public
+    working_dir: /var/www/html
     command: php-fpm
     ports:
       - "9000"
@@ -55,6 +55,34 @@ services:
       app-network:
         ipv4_address: 21.1.0.103
     
+  supervisor: 
+    image: app
+    container_name: supervisor
+    environment:
+      CONTAINER_ROLE: default-queue  
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      app-network:
+        ipv4_address: 21.1.0.104
+    depends_on: 
+      - "app" 
+
+  scheduler: 
+    image: app
+    container_name: scheduler
+    environment:
+      CONTAINER_ROLE: scheduler  
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      app-network:
+        ipv4_address: 21.1.0.105
+    depends_on: 
+      - "app"
+
 networks:
   app-network:
     driver: bridge
