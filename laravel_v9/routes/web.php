@@ -2,6 +2,9 @@
 
 use App\Jobs\ExampleJob;
 use App\Models\User;
+use App\Http\Controllers\{
+    UserController
+};
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 /*
@@ -19,9 +22,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('users', function () {
-    return User::all();
-});
+Route::get('/users', [UserController::class,'index'])->name('users.index');
+Route::get('/users/{id}', [UserController::class,'show'])->name('users.show');
 
 Route::get('create-job', function () {
     ExampleJob::dispatch('lucas','lucas@gmail.com',Hash::make('123456'));
