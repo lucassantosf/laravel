@@ -50,7 +50,7 @@ services:
     volumes:
       - ~/volumes/app/mysql/data/db/:/var/lib/mysql/
       - ~/volumes/app/mysql/dump/:/docker-entrypoint-initdb.d/ 
-    restart: always
+    # restart: always
     networks:
       app-network:
         ipv4_address: 21.1.0.103
