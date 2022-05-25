@@ -28,7 +28,7 @@ do {
     foreach($copyReadStream as $key=>$stream)
     {
         $conteudo = stream_get_contents($stream);
-        $posicaoFimHttp = strpos($conteudo, '\r\n\r\n');
+        $posicaoFimHttp = strpos($conteudo, "\r\n\r\n");
         if($posicaoFimHttp!==false){
             echo substr($conteudo,$posicaoFimHttp + 4);
         }else{
