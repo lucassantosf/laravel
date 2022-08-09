@@ -1,20 +1,3 @@
-# Todo Laravel V9 Boilerplate
-
-[] - Dockerfiles
-
-[] - Auth with Passport or JWT ? What is the best?
-
-[] - Acl Laravel Spatie Permission
-
-[] - Exports examples
-
-[] - Jobs examples
-
-[] - Commands examples
-
-[] - External Lib integration API
-
-
 # Laravel Framework
 
 Este reposítório contém em cada pasta, os respectivos módulos referentes ao curso Completo de Laravel 5.8

@@ -1,0 +1,92 @@
+version: "3.3"
+
+services:
+  nginx:
+    build: 
+        context: .
+        dockerfile: ./environment/nginx/Dockerfile
+    image: ngnix
+    container_name: nginx
+    tty: true
+    ports:
+      - "8000:80"
+    volumes:
+      - ./environment/nginx/default-nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./environment/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks: 
+      application-network:
+        ipv4_address: 17.1.0.101
+    depends_on: 
+      - "application"
+
+  application:
+    build:
+      context: .
+      dockerfile: ./environment/application/Dockerfile
+    image: application
+    container_name: application
+    volumes:
+      - ./:/var/www/html
+      - ./environment/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    working_dir: /var/www/html
+    command: php-fpm
+    ports:
+      - "9000"
+    networks: 
+      application-network:
+        ipv4_address: 17.1.0.102 
+    depends_on: 
+      - "mysql"
+
+  mysql:
+    image: mysql:5.7.22
+    command: --max_allowed_packet=32505856
+    container_name: mysql
+    hostname: mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} 
+    volumes:
+      - ~/volumes/application/mysql/data/db/:/var/lib/mysql/
+      - ~/volumes/application/mysql/dump/:/docker-entrypoint-initdb.d/ 
+    networks:
+      application-network:
+        ipv4_address: 17.1.0.103 
+
+  supervisor: 
+    image: application
+    container_name: supervisor
+    environment:
+      CONTAINER_ROLE: default-queue  
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      application-network:
+        ipv4_address: 17.1.0.104
+    depends_on: 
+      - "application" 
+
+  scheduler: 
+    image: application
+    container_name: scheduler
+    environment:
+      CONTAINER_ROLE: scheduler
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      application-network:
+        ipv4_address: 17.1.0.105
+    depends_on: 
+      - "application" 
+
+networks:
+  application-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 17.1.0.0/24
