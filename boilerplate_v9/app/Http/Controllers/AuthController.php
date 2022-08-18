@@ -25,11 +25,13 @@ class AuthController extends Controller
         if (!auth()->attempt($credentials))
             return response()->json(['error' => 'Unauthorized'], 401);
 
+        $object = auth()->user()->createToken('token');
+
         return response()->json([
             'user' => auth()->user(),
-            'access_token' => auth()->user()->createToken('')->accessToken,
-            // 'role' => auth()->user()->roles->pluck('name'), 
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'access_token' => $object->accessToken,
+            'role' => auth()->user()->roles->pluck('name'), 
+            'expires_in' => $object->token->expires_at->diffInMinutes(Carbon::now()) * 60,
             'token_type' => 'bearer',
         ]);
     }

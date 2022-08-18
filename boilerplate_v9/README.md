@@ -2,7 +2,7 @@
 
 [OK] - Dockerfiles
 
-[] - Auth with Passport or JWT ? What is the best?
+[OK] - Auth with Passport
 
 [] - Acl Laravel Spatie Permission
 
