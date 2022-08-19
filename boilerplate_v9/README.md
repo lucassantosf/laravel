@@ -4,7 +4,7 @@
 
 [OK] - Auth with Passport
 
-[] - Acl Laravel Spatie Permission
+[OK] - Acl Laravel Spatie Permission
 
 [] - Exports examples
 

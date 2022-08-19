@@ -17,5 +17,7 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             RolesPermissionSeeder::class,
         ]);
+
+        \Artisan::call('passport:install');
     }
 }

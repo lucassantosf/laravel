@@ -20,20 +20,31 @@ class RolesPermissionSeeder extends Seeder
         DB::table('permissions')->delete();
         DB::table('roles')->delete(); 
 
-        // Reset cached roles and permissions
+        // Reset cached 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // Creating permissions
         Permission::create(['name'=>'usuario.me','guard_name'=>'api']);
         Permission::create(['name'=>'usuario.index','guard_name'=>'api']);
         
+        // Creating roles and sync permission to roles
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);
         $role->givePermissionTo(Permission::all());
 
         $role_user = Role::create(['name' => 'cliente','guard_name'=>'api']);
         $role_user->givePermissionTo(['usuario.me']);
 
+        // Assign roles to users
         $users_admin = User::whereIn('id',[1])->get(); 
-        $admin = Role::findByName('admin'); 
-        $admin->users()->attach($users_admin);
+        foreach ($users_admin as $key => $admin) {
+            DB::table('model_has_roles')->insert([
+                'role_id'=>$role->id,
+                'model_type'=>'App\Models\User',
+                'model_id'=>$admin->id,
+            ]);
+        }
+
+        // Reset cached  
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
