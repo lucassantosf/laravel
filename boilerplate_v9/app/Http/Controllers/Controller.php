@@ -10,7 +10,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
-    // use DispatchesJobs, ValidatesRequests;
+    use DispatchesJobs, ValidatesRequests;
 
     protected $class;
 
@@ -33,7 +33,13 @@ class Controller extends BaseController
         $this->validate($request, $this->class::arrValidation());
 
         try {
-            return response()->json($this->class::create($request->all()), 200); 
+            $resource = $this->class::create($request->all());
+            $resource->assignRole($request->role); 
+
+            $resource->password = $request->password;
+            $resource->save();
+            
+            return response()->json($resource, 200); 
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
         } 

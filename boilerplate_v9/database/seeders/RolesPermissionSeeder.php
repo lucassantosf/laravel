@@ -25,14 +25,19 @@ class RolesPermissionSeeder extends Seeder
 
         // Creating permissions
         Permission::create(['name'=>'usuario.me','guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.logout','guard_name'=>'api']);
         Permission::create(['name'=>'usuario.index','guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.show','guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.store','guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.update','guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.destroy','guard_name'=>'api']);
         
         // Creating roles and sync permission to roles
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);
         $role->givePermissionTo(Permission::all());
 
         $role_user = Role::create(['name' => 'cliente','guard_name'=>'api']);
-        $role_user->givePermissionTo(['usuario.me']);
+        $role_user->givePermissionTo(['usuario.me','usuario.logout']);
 
         // Assign roles to users
         $users_admin = User::whereIn('id',[1])->get(); 

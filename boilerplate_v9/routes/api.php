@@ -17,24 +17,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 Route::post('/login', [AuthController::class,'login']);
 
-     
+Route::group(['middleware'=>['auth:api','chech_permission']],function(){
 
-Route::group(['middleware'=>['auth:api']],function(){
+    Route::group(['prefix'=>'usuario','as'=>'usuario.'],function(){
+        Route::get('me', [AuthController::class,'me'])->name('me');
+        Route::post('logout', [AuthController::class,'logout'])->name('logout');     
 
-    Route::group(['prefix'=>'users','name'=>'users','controller'=>UserController::class],function(){
-        Route::get('', 'index')->name('index'); 
+        Route::group(['controller'=>UserController::class],function(){
+            Route::get('', 'index')->name('index'); 
+            Route::get('{id}', 'show')->name('show'); 
+            Route::post('', 'store')->name('store'); 
+            Route::post('{id}', 'update')->name('update'); 
+            Route::delete('{id}', 'destroy')->name('destroy'); 
+        });
     });
-
-    Route::get('/me', [AuthController::class,'me']);
-    Route::post('/logout', [AuthController::class,'logout']);     
     
 });
-
-    // middleware('auth:api')->prefix('users')->name('users')->controller(UserController::class)->group(function () {
-

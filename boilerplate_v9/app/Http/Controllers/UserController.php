@@ -9,7 +9,6 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
         $this->class = User::class;   
     } 
 
