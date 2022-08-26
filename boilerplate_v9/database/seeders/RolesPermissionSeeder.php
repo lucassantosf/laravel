@@ -24,13 +24,19 @@ class RolesPermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Creating permissions
-        Permission::create(['name'=>'usuario.me','guard_name'=>'api']);
-        Permission::create(['name'=>'usuario.logout','guard_name'=>'api']);
-        Permission::create(['name'=>'usuario.index','guard_name'=>'api']);
-        Permission::create(['name'=>'usuario.show','guard_name'=>'api']);
-        Permission::create(['name'=>'usuario.store','guard_name'=>'api']);
-        Permission::create(['name'=>'usuario.update','guard_name'=>'api']);
-        Permission::create(['name'=>'usuario.destroy','guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.me',       'guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.logout',   'guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.index',    'guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.show',     'guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.store',    'guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.update',   'guard_name'=>'api']);
+        Permission::create(['name'=>'usuario.destroy',  'guard_name'=>'api']);
+
+        Permission::create(['name'=>'post.index',       'guard_name'=>'api']);
+        Permission::create(['name'=>'post.show',        'guard_name'=>'api']);
+        Permission::create(['name'=>'post.store',       'guard_name'=>'api']);
+        Permission::create(['name'=>'post.update',      'guard_name'=>'api']);
+        Permission::create(['name'=>'post.destroy',     'guard_name'=>'api']);
         
         // Creating roles and sync permission to roles
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);

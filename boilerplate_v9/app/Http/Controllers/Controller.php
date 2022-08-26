@@ -16,13 +16,8 @@ class Controller extends BaseController
 
     public function index(Request $request)
     {
-        try {
-            $return = $this->class::query();
-            foreach ($request->query() as $key=>$value)
-            {
-                $return->where($key,$value);
-            }
-            return $return->orderby('id','desc')->paginate(10); 
+        try { 
+            return $this->class::index($request);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
         }
@@ -33,13 +28,7 @@ class Controller extends BaseController
         $this->validate($request, $this->class::arrValidation());
 
         try {
-            $resource = $this->class::create($request->all());
-            $resource->assignRole($request->role); 
-
-            $resource->password = $request->password;
-            $resource->save();
-            
-            return response()->json($resource, 200); 
+            return $this->class::store($request);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
         } 
@@ -48,9 +37,7 @@ class Controller extends BaseController
     public function show(Request $request, int $id)
     {
         try {
-            $resource = $this->class::findorFail($id);
-
-            return response()->json($resource, 200); 
+            return $this->class::show($request,$id);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
         } 
@@ -61,12 +48,7 @@ class Controller extends BaseController
         $this->validate($request, $this->class::arrUpdateValidation($id)); 
 
         try {
-            $resource = $this->class::findorFail($id); 
-
-            $resource->fill($request->all());
-            $resource->save();
-
-            return response()->json($resource, 200);
+            return $this->class::update_one($request,$id);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
         } 
@@ -75,14 +57,7 @@ class Controller extends BaseController
     public function destroy(Request $request, int $id)
     {
         try {
-
-            $destroyed = $this->class::destroy($id);
-
-            if($destroyed === 0)
-                return response()->json('Resource does not exist', 404);
-
-            return response()->json('Destroyed', 200);
-
+            return $this->class::destroy($id);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500);  
         } 
