@@ -6,12 +6,16 @@
 
 [OK] - Acl Laravel Spatie Permission
 
-[] - CRUD Example based on model example to extend
+[OK] - Model Base to extend other models
 
-[] - Exports examples
+[OK] - CRUD Example based on model example
+
+[OK] - Exports examples
 
 [] - Jobs examples
 
 [] - Commands examples
 
 [] - External Lib integration API
+
+[] - Tests Coverage examples

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController; 
+use App\Http\Controllers\ReportController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,4 +43,8 @@ Route::group(['middleware'=>['auth:api','chech_permission']],function(){
         Route::delete('{id}', 'destroy')->name('destroy'); 
     });
     
+    Route::group(['prefix'=>'report','as'=>'report.','controller'=>ReportController::class],function(){
+        Route::get('example', 'example')->name('example'); 
+    });
+
 });
