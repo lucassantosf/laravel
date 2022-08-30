@@ -12,7 +12,7 @@
 
 [OK] - Exports examples
 
-[] - Jobs examples
+[OK] - Jobs examples
 
 [] - Commands examples
 

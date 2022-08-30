@@ -40,6 +40,7 @@ Route::group(['middleware'=>['auth:api','chech_permission']],function(){
         Route::get('{id}', 'show')->name('show'); 
         Route::post('', 'store')->name('store'); 
         Route::post('{id}', 'update')->name('update'); 
+        Route::post('{id}/job', 'job')->name('job'); 
         Route::delete('{id}', 'destroy')->name('destroy'); 
     });
     

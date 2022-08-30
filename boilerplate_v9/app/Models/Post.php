@@ -10,6 +10,7 @@ class Post extends Base
         'user_id',  
         'title',
         'content',
+        'status',
     ]; 
 
     public static function arrValidation(){
