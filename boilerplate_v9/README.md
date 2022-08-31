@@ -14,7 +14,7 @@
 
 [OK] - Jobs examples
 
-[] - Commands examples
+[OK] - Commands examples
 
 [] - External Lib integration API
 
