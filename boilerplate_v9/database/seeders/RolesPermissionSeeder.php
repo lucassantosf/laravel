@@ -40,6 +40,7 @@ class RolesPermissionSeeder extends Seeder
         Permission::create(['name'=>'post.job',         'guard_name'=>'api']);
         
         Permission::create(['name'=>'report.example',   'guard_name'=>'api']);
+        Permission::create(['name'=>'document.validate','guard_name'=>'api']);
         
         // Creating roles and sync permission to roles
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);

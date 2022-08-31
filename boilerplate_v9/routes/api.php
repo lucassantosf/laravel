@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController; 
 use App\Http\Controllers\ReportController; 
+use App\Http\Controllers\SerproController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,10 @@ Route::group(['middleware'=>['auth:api','chech_permission']],function(){
     
     Route::group(['prefix'=>'report','as'=>'report.','controller'=>ReportController::class],function(){
         Route::get('example', 'example')->name('example'); 
+    });
+
+    Route::group(['prefix'=>'document','as'=>'document.','controller'=>SerproController::class],function(){
+        Route::post('validate', 'validate_document')->name('validate'); 
     });
 
 });
