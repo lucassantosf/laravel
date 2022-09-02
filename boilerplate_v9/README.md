@@ -18,4 +18,4 @@
 
 [OK] - External Lib integration API
 
-[] - Tests Coverage examples
+[OK] - Tests Coverage examples
