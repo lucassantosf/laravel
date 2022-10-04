@@ -14,7 +14,7 @@ if [ "$role" = "app" ]; then
         php artisan migrate
     fi
 
-    sudo php artisan cache:clear
+    # sudo php artisan cache:clear
     exec php-fpm
 
 elif [ "$role" = "default-queue" ]; then
