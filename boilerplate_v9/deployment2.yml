@@ -1,24 +1,18 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
+apiVersion: v1
+kind: Pod
+metadata: 
   name: laravel
+  labels:
+    app: laravel
 spec:
-  selector:
-    matchLabels:
-      run: laravel
-  template:
-    metadata:
-      labels:
-        run: laravel
-    spec:
-      containers:
-        - name: demo
-          image: lucasfer/laravel_app
-          ports:
-          - containerPort: 80
-          envFrom:
-            - configMapRef:
-                name: laravel-configmap
+  containers:
+    - name: laravel
+      image: lucasfer/laravel_app
+      ports:
+        - containerPort: 80
+      envFrom:
+        - configMapRef:
+            name: laravel-configmap
 
 ---
 apiVersion: v1
@@ -47,10 +41,10 @@ data:
   APP_ENV: "production"
   APP_KEY: "base64:nQKCOivp3DJkaRqGmYfEBPu++2gCy3wUrADJn8crvfI="
   APP_NAME: "My App"
-  APP_URL: "http://myapp.com"
+  APP_URL: "http://192.168.59.100:30000"
   DB_CONNECTION: "mysql"
   DB_DATABASE: "laravel"
-  DB_HOST: "myapp-mysql"
+  DB_HOST: "http://192.168.59.100"
   DB_PASSWORD: "123456"
   DB_PORT: "3306"
   DB_USERNAME: "root"
