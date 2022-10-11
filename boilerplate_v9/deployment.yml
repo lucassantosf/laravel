@@ -19,13 +19,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: laravel
-spec:
-  ports:
-  - port: 80
+  labels:
+    app: laravel 
+spec: 
   selector:
-    app: laravel
-  clusterIP: None
-  
+    app: laravel 
+  ports:
+    - protocol: TCP
+      port: 9000
+    
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -36,7 +38,7 @@ data:
   APP_ENV: "local"
   APP_KEY: "base64:nQKCOivp3DJkaRqGmYfEBPu++2gCy3wUrADJn8crvfI="
   APP_NAME: "My App"
-  APP_URL: "http://192.168.59.100:30000"
+  APP_URL: "http://192.168.59.100:80/api"
   DB_CONNECTION: "mysql"
   DB_DATABASE: "laravel"
   DB_HOST: "mysql"
