@@ -21,7 +21,7 @@ spec:
     app: mysql
   ports:
     - port: 3306
-      nodePort: 30002
+      nodePort: 30001
 ---
 apiVersion: apps/v1
 kind: Deployment
