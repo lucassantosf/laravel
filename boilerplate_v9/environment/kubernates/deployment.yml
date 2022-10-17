@@ -1,42 +1,45 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata:
+metadata: 
   name: laravel
+  labels:
+    tier: backend
 spec:
+  replicas: 5
   selector:
     matchLabels:
-      run: laravel
+      app: laravel
+      tier: backend
   template:
     metadata:
       labels:
-        run: laravel
+        app: laravel
+        tier: backend
     spec:
       containers:
-        - name: demo
-          image: lucasfer/laravel_app
-          ports:
-          - containerPort: 80
+        - name: laravel
+          image: lucasfer/laravel_app:latest
           envFrom:
             - configMapRef:
                 name: laravel-configmap
 
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
   name: laravel
   labels:
-    app: laravel
-    tier: web
-spec:
-  type: NodePort
+    app: laravel 
+    tier: backend
+spec: 
   selector:
-    app: laravel
-    tier: web
+    app: laravel 
+    tier: backend
   ports:
-    - port: 80
-      nodePort: 30000
-
+    - protocol: TCP
+      port: 9000
+    
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -44,13 +47,13 @@ metadata:
   name: laravel-configmap
 data:
   APP_DEBUG: "false"
-  APP_ENV: "production"
+  APP_ENV: "local"
   APP_KEY: "base64:nQKCOivp3DJkaRqGmYfEBPu++2gCy3wUrADJn8crvfI="
   APP_NAME: "My App"
-  APP_URL: "http://myapp.com"
+  APP_URL: "http://192.168.59.100:80/api"
   DB_CONNECTION: "mysql"
   DB_DATABASE: "laravel"
-  DB_HOST: "myapp-mysql"
+  DB_HOST: "mysql"
   DB_PASSWORD: "123456"
   DB_PORT: "3306"
   DB_USERNAME: "root"

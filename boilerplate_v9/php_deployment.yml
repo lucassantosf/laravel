@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: php
+        tier: backend
+    spec:
+      volumes:
+      - name: dir
+        hostPath:
+          path: /code
+      containers:
+      - name: php
+        image: lucasfer/laravel_app:latest
+        envFrom:
+          - configMapRef:
+              name: laravel-configmap
+        volumeMounts:
+        - name: dir
+          mountPath: /code
+      initContainers:
+      - name: install
+        image: busybox
+        volumeMounts:
+        - name: dir
+          mountPath: /code
+        command:
+        - cp
+        - "-r"
+        - "/var/www/."
+        - "/code/app"

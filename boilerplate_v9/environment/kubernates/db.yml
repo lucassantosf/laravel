@@ -1,74 +1,59 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: myapp-mysql
-  labels:
-    app: myapp
-    tier: mysql
+  name: mysql
 spec:
   ports:
-    - port: 3306
+  - port: 3306
   selector:
-    app: myapp
-    tier: mysql
+    app: mysql
   clusterIP: None
-
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: Service
 metadata:
-  name: mysql-pv-claim
+  name: mysql-service
   labels:
-    app: myapp
-    tier: mysql
+    app: mysql
 spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-
+  type: NodePort
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      nodePort: 30001
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp-mysql
-  labels:
-    app: myapp
-    tier: mysql
+  name: mysql
 spec:
   selector:
     matchLabels:
-      app: myapp
-      tier: mysql
+      app: mysql
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
-        app: myapp
-        tier: mysql
+        app: mysql
     spec:
       containers:
       - image: mysql:5.7
         name: mysql
         env:
-        - name: MYSQL_RANDOM_ROOT_PASSWORD
-          value: "true"
-        - name: MYSQL_USER
-          value: root
+        - name: MYSQL_ROOT_PASSWORD
+          value: "123456"
         - name: MYSQL_DATABASE
           value: laravel
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              name: laravel-configmap
-              key: DB_PASSWORD
         ports:
         - containerPort: 3306
           name: mysql
         volumeMounts:
-        - name: mysql-persistent-storage
+        - name: mysql-pv-volume
           mountPath: /var/lib/mysql
       volumes:
-      - name: mysql-persistent-storage
+      - name: mysql-pv-volume
         persistentVolumeClaim:
           claimName: mysql-pv-claim
+          
