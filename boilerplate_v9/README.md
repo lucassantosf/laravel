@@ -19,3 +19,6 @@
 [OK] - External Lib integration API
 
 [OK] - Tests Coverage examples
+
+cp -r /var/www/. /code/app
+chmod o+w ./storage/ -R
