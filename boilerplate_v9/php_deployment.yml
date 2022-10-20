@@ -29,14 +29,15 @@ spec:
         volumeMounts:
         - name: dir
           mountPath: /code
+        lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "cp -r /var/www/. /code/app"]
+                command: ["/bin/sh", "-c", "chmod o+w /code/app/storage/ -R"]
+                command: ["/bin/sh", "-c", "php /code/app/artisan migrate --seed"]
       initContainers:
       - name: install
         image: busybox
         volumeMounts:
         - name: dir
           mountPath: /code
-        command:
-        - cp
-        - "-r"
-        - "/var/www/."
-        - "/code/app"
