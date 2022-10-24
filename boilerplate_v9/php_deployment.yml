@@ -32,9 +32,9 @@ spec:
         lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "cp -r /var/www/. /code/app"]
-                command: ["/bin/sh", "-c", "chmod o+w /code/app/storage/ -R"]
-                command: ["/bin/sh", "-c", "php /code/app/artisan migrate --seed"]
+                command: ["/bin/sh", "-c", "cp -r /var/www/. /code/app && chmod o+w /code/app/storage/ -R && cd /code/app/ && php artisan migrate:fresh --seed "]
+                # command: ["/bin/sh", "-c", "chmod o+w /code/app/storage/ -R"]
+                # command: ["/bin/sh", "-c", "cd /code/app/ && php artisan migrate --seed"]
       initContainers:
       - name: install
         image: busybox
