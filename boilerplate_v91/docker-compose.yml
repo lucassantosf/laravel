@@ -16,44 +16,44 @@ services:
     networks: 
       application-network:
         ipv4_address: 17.1.0.101
-    # depends_on: 
-    #   - "application"
+    depends_on: 
+      - "application"
 
-  # application:
-  #   build:
-  #     context: .
-  #     dockerfile: ./environment/application/Dockerfile
-  #   image: application
-  #   container_name: application
-  #   volumes:
-  #     - ./:/var/www/html
-  #     - ./environment/custom.ini:/usr/local/etc/php/conf.d/custom.ini
-  #   working_dir: /var/www/html
-  #   command: php-fpm
-  #   ports:
-  #     - "9000"
-  #   networks: 
-  #     application-network:
-  #       ipv4_address: 17.1.0.102 
-  #   # depends_on: 
-  #   #   - "sqlserver"
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver
-    hostname: sqlserver
+  application:
+    build:
+      context: .
+      dockerfile: ./environment/application/Dockerfile
+    image: application
+    container_name: application
+    volumes:
+      - ./:/var/www/html
+      - ./environment/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    working_dir: /var/www/html
+    command: php-fpm
     ports:
-      - "1433:1433"
-    environment:
-      SA_PASSWORD: "SqlServer2019!"
-      ACCEPT_EULA: "Y"
-      MSSQL_PID: "Developer"
-    # volumes:
-    #   - ~/volumes/application/mysql/data/db/:/var/lib/mysql/
-    #   - ~/volumes/application/mysql/dump/:/docker-entrypoint-initdb.d/ 
-    networks:
+      - "9000"
+    networks: 
       application-network:
-        ipv4_address: 17.1.0.103 
+        ipv4_address: 17.1.0.102 
+    # depends_on: 
+    #   - "sqlserver"
+
+  # sqlserver:
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   container_name: sqlserver
+  #   hostname: sqlserver
+  #   ports:
+  #     - "1433:1433"
+  #   environment:
+  #     SA_PASSWORD: "SqlServer2019!"
+  #     ACCEPT_EULA: "Y"
+  #     MSSQL_PID: "Developer"
+  #   # volumes:
+  #   #   - ~/volumes/application/mysql/data/db/:/var/lib/mysql/
+  #   #   - ~/volumes/application/mysql/dump/:/docker-entrypoint-initdb.d/ 
+  #   networks:
+  #     application-network:
+  #       ipv4_address: 17.1.0.103 
 
 networks:
   application-network:

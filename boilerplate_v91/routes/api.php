@@ -7,6 +7,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SerproController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,12 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::post('/teste', function(){
+    $t = DB::table('ADM_ATUALIZACAO_SISTEMA')->get();
+    dd($t);
+    return true;
+});
 
 Route::post('/login', [AuthController::class,'login']);
 
