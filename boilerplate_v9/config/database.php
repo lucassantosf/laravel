@@ -63,6 +63,26 @@ return [
             ]) : [],
         ],
 
+        'mysql_2' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE_2', 'forge'),
+            'username' => env('DB_USERNAME_2', 'forge'),
+            'password' => env('DB_PASSWORD_2', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
@@ -91,6 +111,18 @@ return [
             'prefix_indexes' => true,
         ],
 
+        'sqlsrv_api' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_API', 'localhost'),
+            'port' => env('DB_PORT_API', '1433'),
+            'database' => env('DB_DATABASE_API', 'forge'),
+            'username' => env('DB_USERNAME_API', 'forge'),
+            'password' => env('DB_PASSWORD_API', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
     ],
 
     /*
