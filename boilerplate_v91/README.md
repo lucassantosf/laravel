@@ -19,3 +19,5 @@
 [OK] - External Lib integration API
 
 [OK] - Tests Coverage examples
+
+[OK] - SqlServer Driver and Connection with Docker

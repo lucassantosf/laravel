@@ -1,4 +1,4 @@
-# Todo Laravel V9 Boilerplate
+# Todo Laravel V9 Boilerplate with SqlServer Driver
 
 [OK] - Dockerfiles
 
@@ -20,6 +20,4 @@
 
 [OK] - Tests Coverage examples
 
-[OK] - Example multiple connections databases
-
-[OK] - Examples yml kubernetes
+[] - Nosql Querys examples
