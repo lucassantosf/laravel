@@ -38,21 +38,31 @@ services:
     depends_on: 
       - "sqlserver"
 
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver
-    hostname: sqlserver
-    ports:
-      - "1433:1433"
+  mongo:
+    # build:
+    #   context: ./
+    #   dockerfile: ./environment/mongo/Dockerfile
+    image: mongo:4.2.8
+    command: [--auth]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
     environment:
-      SA_PASSWORD: "SqlServer2019!"
-      ACCEPT_EULA: "Y"
-      MSSQL_PID: "Developer"
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=zHgb8sH5F523rwR
+      - MONGO_INITDB_USERNAME=${MONGO_USR}
+      - MONGO_INITDB_PASSWORD=${MONGO_PWD}
+      - MONGO_INITDB_DATABASE=${MONGO_AUTHDB}
     volumes:
-      - ~/volumes/application/sqlserver/data/:/var/opt/mssql 
+      - ./environment/mongo/data/db:/data/db
+      - ./environment/mongo/data/entries/:/docker-entrypoint-initdb.d/
+    container_name: mongo
+    ports:
+      - "27017"
     networks:
-      application-network:
-        ipv4_address: 17.1.0.103 
+      yetz-network:
+        ipv4_address: 10.1.0.102
 
 networks:
   application-network:
