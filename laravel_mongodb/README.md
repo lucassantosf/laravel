@@ -21,3 +21,5 @@
 [OK] - Tests Coverage examples
 
 [] - Nosql Querys examples
+
+mongo mongodb://root:zHgb8sH5F523rwR@localhost:27017
