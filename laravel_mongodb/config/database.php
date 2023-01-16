@@ -91,6 +91,11 @@ return [
             'prefix_indexes' => true,
         ],
 
+        'mongodb' => [
+			'driver' => 'mongodb',
+			'dsn' => env('MONGO_DSN', 'mongodb://root:zHgb8sH5F523rwR@mongo:27017/?authSource=admin'),
+			'database' => env('MONGO_DATABASE', 'admin'),
+		],
     ],
 
     /*

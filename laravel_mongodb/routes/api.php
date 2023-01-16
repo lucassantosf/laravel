@@ -20,10 +20,9 @@ use Illuminate\Support\Facades\DB;
 |
 */
 
-Route::post('/teste', function(){
-    $t = DB::table('ADM_ATUALIZACAO_SISTEMA')->get();
-    dd($t);
-    return true;
+Route::get('/ping', function(){
+    $a = \App\Mongo\Carga::create(['title'=>'title 123']);
+    return $a;
 });
 
 Route::post('/login', [AuthController::class,'login']);
@@ -42,22 +41,4 @@ Route::group(['middleware'=>['auth:api','chech_permission']],function(){
             Route::delete('{id}', 'destroy')->name('destroy'); 
         });
     });
-
-    Route::group(['prefix'=>'post','as'=>'post.','controller'=>PostController::class],function(){
-        Route::get('', 'index')->name('index'); 
-        Route::get('{id}', 'show')->name('show'); 
-        Route::post('', 'store')->name('store'); 
-        Route::post('{id}', 'update')->name('update'); 
-        Route::post('{id}/job', 'job')->name('job'); 
-        Route::delete('{id}', 'destroy')->name('destroy'); 
-    });
-    
-    Route::group(['prefix'=>'report','as'=>'report.','controller'=>ReportController::class],function(){
-        Route::get('example', 'example')->name('example'); 
-    });
-
-    Route::group(['prefix'=>'document','as'=>'document.','controller'=>SerproController::class],function(){
-        Route::post('validate', 'validate_document')->name('validate'); 
-    });
-
 });
