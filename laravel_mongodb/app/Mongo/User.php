@@ -5,14 +5,13 @@ namespace App\Mongo;
 use App\Models\Acao;
 use Jenssegers\Mongodb\Eloquent\Model;
 
-class Carga extends Model
+class User extends Model
 {
 	protected $connection = 'mongodb';
-	protected $collection = 'cargas';
+	protected $collection = 'users';
     // protected $primaryKey = 'id';
 
 	protected $fillable = [
-		'user_id',
-		'title',
+		'name',
 	];
 }

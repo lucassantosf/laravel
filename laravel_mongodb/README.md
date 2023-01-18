@@ -2,7 +2,9 @@
 
 [OK] - Dockerfiles
 
-[OK] - Auth with Passport
+[OK] - Nosql Querys examples
+
+[*] - Auth with Passport with Model User connection mongodb
 
 [OK] - Acl Laravel Spatie Permission
 
@@ -10,16 +12,6 @@
 
 [OK] - CRUD Example based on model example
 
-[OK] - Exports examples
-
-[OK] - Jobs examples
-
-[OK] - Commands examples
-
-[OK] - External Lib integration API
-
 [OK] - Tests Coverage examples
-
-[] - Nosql Querys examples
 
 mongo mongodb://root:zHgb8sH5F523rwR@localhost:27017

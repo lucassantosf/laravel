@@ -21,8 +21,31 @@ use Illuminate\Support\Facades\DB;
 */
 
 Route::get('/ping', function(){
-    $a = \App\Mongo\Carga::create(['title'=>'title 123']);
-    return $a;
+
+    //insert example
+    //$user = \App\Mongo\User::create(['name'=>'username']);
+    //$resource = \App\Mongo\Carga::create(['title'=>'title 123','user_id'=>$user->id_]);
+    // return $resource;
+
+    //63c86a1e2f6d4d4c980f9ca4 user_id
+    //63c86a1e2f6d4d4c980f9ca5 carga_id
+
+    //index
+    $resource = \App\Mongo\Carga::orderBy('created_at','DESC')->get();
+    return $resource;
+
+    //show
+    // $resource = \App\Mongo\Carga::where('_id','63c86a1e2f6d4d4c980f9ca5')->first();
+    // return $resource;
+
+    //update
+    // $resource = \App\Mongo\Carga::where('_id','63c86a1e2f6d4d4c980f9ca5')->first();
+    // $resource->update(['title'=>'title updated']);
+    // return $resource;
+
+    //delete
+    $resource = \App\Mongo\Carga::where('_id','63c86a1e2f6d4d4c980f9ca5')->delete();
+    return 'destroyed success '.$resource;
 });
 
 Route::post('/login', [AuthController::class,'login']);
