@@ -27,11 +27,9 @@ Route::get('/ping', function(){
     //$resource = \App\Mongo\Carga::create(['title'=>'title 123','user_id'=>$user->id_]);
     // return $resource;
 
-    //63c86a1e2f6d4d4c980f9ca4 user_id
-    //63c86a1e2f6d4d4c980f9ca5 carga_id
-
     //index
-    $resource = \App\Mongo\Carga::orderBy('created_at','DESC')->get();
+    // $resource = \App\Mongo\Carga::orderBy('created_at','DESC')->get();
+    $resource = \App\Models\User::orderBy('created_at','DESC')->get();
     return $resource;
 
     //show

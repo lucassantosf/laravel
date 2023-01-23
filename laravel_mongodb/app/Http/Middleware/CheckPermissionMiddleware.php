@@ -18,9 +18,9 @@ class CheckPermissionMiddleware
     {
         $route_name = $request->route()->getName();
 
-        if(!$request->user()->can($route_name)){
-            return response()->json(['This resouce is not allowed for this user'], 401); 
-        }
+        // if(!$request->user()->can($route_name)){
+        //     return response()->json(['This resouce is not allowed for this user'], 401); 
+        // }
 
         return $next($request); 
     }

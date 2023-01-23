@@ -2,16 +2,20 @@
 
 [OK] - Dockerfiles
 
-[OK] - Nosql Querys examples
+[OK] - Mongodb Querys examples
 
-[*] - Auth with Passport with Model User connection mongodb
+[OK] - Auth with Passport and Model User connection mongodb
 
-[OK] - Acl Laravel Spatie Permission
+    https://www.youtube.com/watch?v=zQBMW1HZUNI
 
-[OK] - Model Base to extend other models
+    Necessary command MongoDBPassportFix to fix passport:install and authentication process hapen
 
-[OK] - CRUD Example based on model example
+[*] - ACL
 
-[OK] - Tests Coverage examples
+[] - CRUD for users
+
+Observation:
+
+Command to run inside mongo container and see all collection and databases:
 
 mongo mongodb://root:zHgb8sH5F523rwR@localhost:27017

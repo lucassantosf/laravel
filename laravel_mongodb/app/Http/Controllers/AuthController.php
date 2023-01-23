@@ -30,7 +30,6 @@ class AuthController extends Controller
         return response()->json([
             'user' => auth()->user(),
             'access_token' => $object->accessToken,
-            'role' => auth()->user()->roles->pluck('name'), 
             'expires_in' => $object->token->expires_at->diffInMinutes(Carbon::now()) * 60,
             'token_type' => 'bearer',
         ]);
