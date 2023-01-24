@@ -34,7 +34,7 @@ class Controller extends BaseController
         } 
     }
 
-    public function show(Request $request, int $id)
+    public function show(Request $request, $id)
     {
         try {
             return $this->class::show($request,$id);

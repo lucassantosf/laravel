@@ -32,16 +32,8 @@ class RolesPermissionSeeder extends Seeder
         Permission::create(['name'=>'usuario.update',   'guard_name'=>'api']);
         Permission::create(['name'=>'usuario.destroy',  'guard_name'=>'api']);
 
-        Permission::create(['name'=>'post.index',       'guard_name'=>'api']);
-        Permission::create(['name'=>'post.show',        'guard_name'=>'api']);
-        Permission::create(['name'=>'post.store',       'guard_name'=>'api']);
-        Permission::create(['name'=>'post.update',      'guard_name'=>'api']);
-        Permission::create(['name'=>'post.destroy',     'guard_name'=>'api']);
-        Permission::create(['name'=>'post.job',         'guard_name'=>'api']);
-        
-        Permission::create(['name'=>'report.example',   'guard_name'=>'api']);
-        Permission::create(['name'=>'document.validate','guard_name'=>'api']);
-        
+        Permission::create(['name'=>'permission.index', 'guard_name'=>'api']);
+
         // Creating roles and sync permission to roles
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);
         $role->givePermissionTo(Permission::all());
@@ -50,7 +42,7 @@ class RolesPermissionSeeder extends Seeder
         $role_user->givePermissionTo(['usuario.me','usuario.logout']);
 
         // Assign roles to users
-        $users_admin = User::whereIn('id',[1])->get(); 
+        $users_admin = User::where('name','admin')->get(); 
         foreach ($users_admin as $key => $admin) {
             DB::table('model_has_roles')->insert([
                 'role_id'=>$role->id,

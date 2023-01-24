@@ -4,18 +4,16 @@ namespace App\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Authenticatable;
-// use Illuminate\Foundation\Auth\User as Authenticatable;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Laravel\Passport\HasApiTokens;
-
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash;
- 
+use Spatie\Permission\Traits\HasRoles;
+
 class User extends Eloquent implements AuthenticatableContract
 {
-    use Authenticatable, HasApiTokens, HasFactory, Notifiable;
+    use HasRoles,Authenticatable, HasApiTokens, HasFactory, Notifiable;
 
     protected $connection = 'mongodb';
     /**
@@ -78,6 +76,10 @@ class User extends Eloquent implements AuthenticatableContract
 
     public static function index(){
         return self::all();
+    }
+
+    public static function show($id){
+        return self::where('_id',$id)->first();
     }
 
 }

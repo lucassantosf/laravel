@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User; 
+use App\Models\Permission; 
 use Illuminate\Http\Request; 
 
-class UserController extends Controller
+class PermissionController extends Controller
 {
     public function __construct()
     {
-        $this->class = User::class;   
+        $this->class = Permission::class;   
     } 
 
-    public function show(Request $request, $id)
+    public function index(Request $request)
     {
-        try {
-            return $this->class::show($request,$id);
+        try { 
+            return $this->class::all();
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
-        } 
+        }
     }
 
 }

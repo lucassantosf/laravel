@@ -10,9 +10,7 @@
 
     Necessary command MongoDBPassportFix to fix passport:install and authentication process hapen
 
-[*] - ACL
-
-[] - CRUD for users
+[X] - ACL didn't work with Laravel Spatie Permission
 
 Observation:
 

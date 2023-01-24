@@ -2,9 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PostController; 
-use App\Http\Controllers\ReportController; 
-use App\Http\Controllers\SerproController; 
+use App\Http\Controllers\PermissionController; 
+use App\Http\Controllers\RoleController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +28,8 @@ Route::get('/ping', function(){
 
     //index
     // $resource = \App\Mongo\Carga::orderBy('created_at','DESC')->get();
-    $resource = \App\Models\User::orderBy('created_at','DESC')->get();
+    $resource = \App\Models\Role::orderBy('created_at','DESC')->get();
+    $resource = DB::table('model_has_roles')->get();
     return $resource;
 
     //show
@@ -60,6 +60,18 @@ Route::group(['middleware'=>['auth:api','chech_permission']],function(){
             Route::post('', 'store')->name('store'); 
             Route::post('{id}', 'update')->name('update'); 
             Route::delete('{id}', 'destroy')->name('destroy'); 
+        });
+    });
+
+    Route::group(['prefix'=>'permission','as'=>'permission.'],function(){
+        Route::group(['controller'=>PermissionController::class],function(){
+            Route::get('', 'index')->name('index'); 
+        });
+    });
+
+    Route::group(['prefix'=>'role','as'=>'role.'],function(){
+        Route::group(['controller'=>RoleController::class],function(){
+            Route::get('', 'index')->name('index'); 
         });
     });
 });
