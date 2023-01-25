@@ -6,7 +6,7 @@ services:
         context: .
         dockerfile: ./environment/nginx/Dockerfile
     image: ngnix
-    container_name: nginx__
+    container_name: nginx
     tty: true
     ports:
       - "8000:80"

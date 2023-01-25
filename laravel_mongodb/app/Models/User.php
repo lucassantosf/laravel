@@ -57,8 +57,6 @@ class User extends Eloquent implements AuthenticatableContract
             'name' => 'required|string',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
-            'role' => 'required|in:'.implode(',',Role::all()->pluck('name')->toArray()),
-            "document" => "string|unique:users,document",
         ];
     } 
 
@@ -67,10 +65,7 @@ class User extends Eloquent implements AuthenticatableContract
         return [
             "name" => "string|max:255",
             "email" => "string|email|max:255|unique:users,email,".$id.",id",
-            "document" => "string|unique:users,document,$id",
             "password" => "string|min:8|confirmed",
-            'role' => 'in:'.implode(',',Role::all()->pluck('name')->toArray()),
-            'phone_number' => 'string|max:13',
         ];
     }
 
@@ -79,7 +74,20 @@ class User extends Eloquent implements AuthenticatableContract
     }
 
     public static function show($id){
-        return self::where('_id',$id)->first();
+        $user = self::where('_id',$id)->first();
+        return response()->json($user, 200);
+    }
+
+    public static function store($request){
+        $user = self::create($request->all());
+        return response()->json($user, 200);
+    }
+
+    public static function update_one($request,$id){
+        $user = self::where('_id',$id)->first();
+        $user->fill($request->all());
+        $user->save(); 
+        return response()->json($user, 200);
     }
 
 }

@@ -43,7 +43,7 @@ class Controller extends BaseController
         } 
     }
 
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         $this->validate($request, $this->class::arrUpdateValidation($id)); 
 
@@ -54,7 +54,7 @@ class Controller extends BaseController
         } 
     }
 
-    public function destroy(Request $request, int $id)
+    public function destroy(Request $request, $id)
     {
         try {
             return $this->class::destroy($id);

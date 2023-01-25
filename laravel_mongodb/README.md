@@ -12,6 +12,8 @@
 
 [X] - ACL didn't work with Laravel Spatie Permission
 
+[OK] - CRUD users
+
 Observation:
 
 Command to run inside mongo container and see all collection and databases:

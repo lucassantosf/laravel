@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 */
 
 Route::get('/ping', function(){
-
+    return 'pong';
     //insert example
     //$user = \App\Mongo\User::create(['name'=>'username']);
     //$resource = \App\Mongo\Carga::create(['title'=>'title 123','user_id'=>$user->id_]);
@@ -29,7 +29,6 @@ Route::get('/ping', function(){
     //index
     // $resource = \App\Mongo\Carga::orderBy('created_at','DESC')->get();
     $resource = \App\Models\Role::orderBy('created_at','DESC')->get();
-    $resource = DB::table('model_has_roles')->get();
     return $resource;
 
     //show
