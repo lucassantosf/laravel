@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    tier: backend
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: backend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    tier: backend
+    app: nginx
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30000
+  selector:
+    tier: backend
+    app: nginx
+  type: LoadBalancer
+  
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  labels:
+    tier: backend
+data:
+  config : |
+    server {
+      index index.php index.htm index.html;
+
+      root /var/www/html/public;
+
+      location / {
+        try_files $uri $uri/ /index.php?$query_string;
+      }
+
+      location /api { 
+        try_files $uri $uri/ /index.php?$query_string;
+      }
+
+      location /index.php {
+        include fastcgi_params;
+        fastcgi_connect_timeout 40s;
+        fastcgi_read_timeout 10s;
+        fastcgi_buffers 256 4k;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass 10.104.63.152:9000;
+      }
+    }
