@@ -11,3 +11,6 @@
 [*] - Model Base to extend other models
 
 [*] - CRUD Example based on model example
+
+Tentar
+https://github.com/phpredis/phpredis#class-redis

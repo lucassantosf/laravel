@@ -8,6 +8,8 @@ use App\Http\Controllers\SerproController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\Redis;
+use App\Jobs\FirstJob;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,6 +20,13 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/ping', function(){
+    // Redis::set('name',1,'Taylor');
+    // $values = Redis::lrange('name', 5, 10);
+    dispatch(new FirstJob());
+    dd("a");
+});
 
 Route::post('/login', [AuthController::class,'login']);
 

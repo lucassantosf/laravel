@@ -6,7 +6,7 @@ services:
         context: .
         dockerfile: ./environment/nginx/Dockerfile
     image: ngnix
-    container_name: nginx
+    container_name: nginx__
     tty: true
     ports:
       - "8000:80"
@@ -41,7 +41,7 @@ services:
   mysql:
     image: mysql:5.7.22
     command: --max_allowed_packet=32505856
-    container_name: mysql
+    container_name: mysql__
     hostname: mysql
     ports:
       - "3307:3306"
@@ -55,19 +55,19 @@ services:
       application-network:
         ipv4_address: 19.1.0.103 
 
-  # scheduler: 
-  #   image: application
-  #   container_name: scheduler
-  #   environment:
-  #     CONTAINER_ROLE: scheduler
-  #   volumes:
-  #     - ./:/var/www/html
-  #   working_dir: /var/www/html  
-  #   networks: 
-  #     application-network:
-  #       ipv4_address: 19.1.0.104
-  #   depends_on: 
-  #     - "application" 
+  supervisor: 
+    image: application
+    container_name: supervisor__
+    environment:
+      CONTAINER_ROLE: default-queue
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      application-network:
+        ipv4_address: 19.1.0.104
+    depends_on: 
+      - "application" 
 
   redis:
     container_name: redis

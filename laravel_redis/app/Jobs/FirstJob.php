@@ -7,16 +7,14 @@ use DB;
 
 class FirstJob extends Job
 {
-    protected $post;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Post $post)
+    public function __construct()
     {
-        $this->post = $post;
+
     }
  
     /**
@@ -29,7 +27,14 @@ class FirstJob extends Job
         DB::beginTransaction();
         
         try {
-            $this->post->update(['status'=>1]);
+
+            DB::table('failed_jobs')->insert([ 
+                'connection'=>'FirstJob',
+                'queue'=>'',
+                'payload'=>'', 
+                'exception'=>'',
+                'failed_at'=>date("Y-m-d H:i:s")
+            ]);
 
             DB::commit();
         } catch (\Throwable $th) {  
