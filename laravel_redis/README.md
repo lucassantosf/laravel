@@ -1,6 +1,6 @@
 # Todo Laravel V9 Boilerplate
 
-[*] - Dockerfiles
+[OK] - Dockerfiles
 
 [*] - Jobs examples
 
@@ -14,3 +14,11 @@
 
 Tentar
 https://github.com/phpredis/phpredis#class-redis
+
+acccess container redis
+
+docker exec -it redis sh
+redis-cli
+auth RrIBIQ5ARhrA
+keys *
+mget ...

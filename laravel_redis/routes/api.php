@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Session;
 use App\Jobs\FirstJob;
 /*
 |--------------------------------------------------------------------------
@@ -21,10 +22,17 @@ use App\Jobs\FirstJob;
 |
 */
 
-Route::get('/ping', function(){
+Route::get('/ping', function(Request $request){
     // Redis::set('name',1,'Taylor');
     // $values = Redis::lrange('name', 5, 10);
+    // Session::set('key','teste');
+    $request->session()->put('hello', 'hello');
+    // dd(session()->get('hello'));
+
+    dd("ok");
+
     dispatch(new FirstJob());
+    
     dd("a");
 });
 

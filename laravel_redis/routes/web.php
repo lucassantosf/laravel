@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Jobs\FirstJob;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function (Request $request) {
+
+    // $request->session()->put('username','lucas');
+    // $request->session()->save();
+    // dispatch( new FirstJob()->onQueue('default')->onConnection('redis') );
+    FirstJob::dispatch()->onQueue('DEFAULT')->onConnection('redis');
+    return 'ok';
+
+    // return view('welcome');
+
+    // $a = $request->session()->get('username');
+    // dd('a',$a);
+
+    $queue = Queue::push('LogMessage',array('message'=>'Time: '.time()));
+    return $queue;
 });

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\Post; 
 use DB;
 
 class FirstJob extends Job
@@ -24,29 +23,30 @@ class FirstJob extends Job
      */
     public function handle()
     {  
-        DB::beginTransaction();
+        // DB::beginTransaction();
         
-        try {
+        // try {
 
-            DB::table('failed_jobs')->insert([ 
-                'connection'=>'FirstJob',
-                'queue'=>'',
-                'payload'=>'', 
-                'exception'=>'',
-                'failed_at'=>date("Y-m-d H:i:s")
+            DB::table('posts')->insert([ 
+                'user_id'=>1,
+                'title'=>'FirstJob',
+                'content'=>'FirstJob',
+                'status'=>1,
+                'created_at'=>date("Y-m-d H:i:s"),
+                'updated_at'=>date("Y-m-d H:i:s")
             ]);
 
-            DB::commit();
-        } catch (\Throwable $th) {  
-            DB::rollback();
-            DB::table('failed_jobs')->insert([ 
-                'connection'=>'FirstJob',
-                'queue'=>'',
-                'payload'=>'', 
-                'exception'=>$th->getMessage().' on line '.$th->getLine(),
-                'failed_at'=>date("Y-m-d H:i:s")
-            ]);
-        } 
+            // DB::commit();
+        // } catch (\Throwable $th) {  
+        //     // DB::rollback();
+        //     DB::table('failed_jobs')->insert([ 
+        //         'connection'=>'FirstJob',
+        //         'queue'=>'',
+        //         'payload'=>'', 
+        //         'exception'=>$th->getMessage().' on line '.$th->getLine(),
+        //         'failed_at'=>date("Y-m-d H:i:s")
+        //     ]);
+        // } 
     }
 
 }
