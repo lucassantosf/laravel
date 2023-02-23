@@ -26,14 +26,13 @@ Route::get('/ping', function(Request $request){
     // Redis::set('name',1,'Taylor');
     // $values = Redis::lrange('name', 5, 10);
     // Session::set('key','teste');
-    $request->session()->put('hello', 'hello');
+    // $request->session()->put('hello', 'hello');
     // dd(session()->get('hello'));
-
+    // $request->session()->put('username','lucas');
+    // $request->session()->save();
+    // dispatch( new FirstJob()->onQueue('default')->onConnection('redis') );
+    FirstJob::dispatch()->onQueue('DEFAULT')->onConnection('redis');
     dd("ok");
-
-    dispatch(new FirstJob());
-    
-    dd("a");
 });
 
 Route::post('/login', [AuthController::class,'login']);
@@ -61,13 +60,4 @@ Route::group(['middleware'=>['auth:api','chech_permission']],function(){
         Route::post('{id}/job', 'job')->name('job'); 
         Route::delete('{id}', 'destroy')->name('destroy'); 
     });
-    
-    Route::group(['prefix'=>'report','as'=>'report.','controller'=>ReportController::class],function(){
-        Route::get('example', 'example')->name('example'); 
-    });
-
-    Route::group(['prefix'=>'document','as'=>'document.','controller'=>SerproController::class],function(){
-        Route::post('validate', 'validate_document')->name('validate'); 
-    });
-
 });

@@ -2,15 +2,13 @@
 
 [OK] - Dockerfiles
 
-[*] - Jobs examples
+[OK] - Jobs examples
 
-[*] - Auth with Passport
+[OK] - Auth with Passport
 
-[*] - Acl Laravel Spatie Permission
+[OK] - Model Base to extend other models
 
-[*] - Model Base to extend other models
-
-[*] - CRUD Example based on model example
+[*] - CRUD Example Post based on model example
 
 Tentar
 https://github.com/phpredis/phpredis#class-redis

@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('post:update')->everyMinute()->appendOutputTo(storage_path('logs/posts.log'));
+
     }
 
     /**

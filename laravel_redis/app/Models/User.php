@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Http\Request;
 
 class User extends Authenticatable
 {
@@ -55,8 +56,6 @@ class User extends Authenticatable
             'name' => 'required|string',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
-            'role' => 'required|in:'.implode(',',Role::all()->pluck('name')->toArray()),
-            "document" => "string|unique:users,document",
         ];
     } 
 
@@ -65,10 +64,64 @@ class User extends Authenticatable
         return [
             "name" => "string|max:255",
             "email" => "string|email|max:255|unique:users,email,".$id.",id",
-            "document" => "string|unique:users,document,$id",
             "password" => "string|min:8|confirmed",
-            'role' => 'in:'.implode(',',Role::all()->pluck('name')->toArray()),
-            'phone_number' => 'string|max:13',
         ];
+    }
+
+    public static function index(Request $request)
+    {     
+        try {
+            $return = self::query();
+            foreach ($request->query() as $key=>$value)
+            {
+                $return->where($key,$value);
+            }
+            return $return->orderby('id','desc')->paginate(10); 
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function store(Request $request)
+    {
+        try {
+            $resource = self::create($request->all());
+            return $resource;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function show(Request $request, int $id)
+    {
+        try {
+            $resource = self::findorFail($id);
+            return $resource;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }  
+
+    public static function update_one(Request $request, int $id)
+    {    
+        try {
+            $resource = self::findorFail($id);
+            $resource->fill($request->all());
+            $resource->save();
+            return $resource;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function destroy($id)
+    {   
+        try {
+            $resource = self::findorFail($id);
+            $resource->delete();
+            return ['destroyed'=>true];
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }
