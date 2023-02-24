@@ -1,22 +1,25 @@
-# Todo Laravel V9 Boilerplate
+# Todo Laravel V9 Boilerplate with Redis
 
 [OK] - Dockerfiles
 
-[OK] - Jobs examples
+[OK] - Job example
 
 [OK] - Auth with Passport
 
-[OK] - Model Base to extend other models
+[OK] - Model Base to extend others
 
-[*] - CRUD Example Post based on model example
+[OK] - CRUD Example Post based on model example
 
-Tentar
-https://github.com/phpredis/phpredis#class-redis
+        *Store method dispatches to Redis process job and save it 
 
-acccess container redis
+# How access and deploy container redis
 
-docker exec -it redis sh
-redis-cli
-auth RrIBIQ5ARhrA
-keys *
-mget ...
+    docker exec -it redis sh
+
+    redis-cli
+    
+    auth RrIBIQ5ARhrA
+    
+    keys *
+    
+    mget ...

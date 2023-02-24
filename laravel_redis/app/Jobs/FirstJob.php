@@ -6,14 +6,16 @@ use DB;
 
 class FirstJob extends Job
 {
+    protected $request;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($request)
     {
-
+        $this->request = $request;
     }
  
     /**
@@ -27,9 +29,9 @@ class FirstJob extends Job
         
         try {
             DB::table('posts')->insert([ 
-                'user_id'=>1,
-                'title'=>'FirstJob',
-                'content'=>'FirstJob',
+                'user_id'=>$this->request['user_id'],
+                'title'=>$this->request['title'],
+                'content'=>$this->request['content'],
                 'status'=>1,
                 'created_at'=>date("Y-m-d H:i:s"),
                 'updated_at'=>date("Y-m-d H:i:s")
