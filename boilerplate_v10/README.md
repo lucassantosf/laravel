@@ -1,21 +1,21 @@
 # Todo Laravel V10 Boilerplate
 
-[*] - Dockerfiles
+[OK] - Dockerfiles
 
-[*] - Auth with Passport
+[OK] - Auth with Passport
 
-[*] - Acl Laravel Spatie Permission
+[OK] - Acl Laravel Spatie Permission
 
-[*] - Model Base to extend other models
+[OK] - Model Base to extend other models
 
 [*] - CRUD Example based on model example
 
-[*] - Exports examples
+[*] - Exports example
 
-[*] - Jobs examples
+[*] - Jobs example
 
-[*] - Commands examples
+[*] - Commands example
 
 [*] - External Lib integration API
 
-[*] - Tests Coverage examples
+[*] - Tests Coverage example
