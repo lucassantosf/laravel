@@ -50,7 +50,11 @@ class Controller extends BaseController
 
     public function update(Request $request, int $id)
     {
-        $this->validate($request, $this->class::arrUpdateValidation($id)); 
+         // Validate Request
+         $validator = Validator::make($request->all(),$this->class::arrUpdateValidation($id));
+
+         if($validator->fails())
+             return response()->json($validator->messages(), 422);
 
         try {
             return $this->class::update_one($request,$id);

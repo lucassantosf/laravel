@@ -8,13 +8,13 @@
 
 [OK] - Model Base to extend other models
 
-[*] - CRUD Example based on model example
+[OK] - CRUD Example based on model example
 
-[*] - Exports example
+[OK] - Exports example
 
-[*] - Jobs example
+[OK] - Jobs example
 
-[*] - Commands example
+[OK] - Commands example
 
 [*] - External Lib integration API
 
