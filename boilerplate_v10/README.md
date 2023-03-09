@@ -16,6 +16,6 @@
 
 [OK] - Commands example
 
-[*] - External Lib integration API
+[OK] - External Lib integration API
 
-[*] - Tests Coverage example
+[OK] - Tests Coverage example
