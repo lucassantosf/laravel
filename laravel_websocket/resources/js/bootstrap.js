@@ -18,9 +18,19 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 import Echo from 'laravel-echo';
 
-// window.Pusher = require('pusher-js');
+// // window.Pusher = require('pusher-js');
+
+window.io = require('socket.io-client');
 
 window.Echo = new Echo({
     broadcaster: 'socket.io',
-    host: window.location.hostname + ":" + window.laravel_echo_port
+    host: window.location.hostname + ':6001',
+});
+
+// window.Echo = new Echo({
+//     broadcaster: 'socket.io',
+//     host: window.location.hostname + ":" + window.laravel_echo_port
+// });
+window.Echo.channel('test-channel').listen('TestEvent', event => {
+    console.log(event);
 });
