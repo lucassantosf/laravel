@@ -58,33 +58,33 @@ services:
       c-network:
         ipv4_address: 21.1.0.103 
 
-  supervisor: 
-    image: application
-    container_name: supervisor_w
-    environment:
-      CONTAINER_ROLE: default-queue  
-    volumes:
-      - ./:/var/www/html
-    working_dir: /var/www/html  
-    networks: 
-      c-network:
-        ipv4_address: 21.1.0.104
-    depends_on: 
-      - "application" 
+  # supervisor: 
+  #   image: application
+  #   container_name: supervisor_w
+  #   environment:
+  #     CONTAINER_ROLE: default-queue  
+  #   volumes:
+  #     - ./:/var/www/html
+  #   working_dir: /var/www/html  
+  #   networks: 
+  #     c-network:
+  #       ipv4_address: 21.1.0.104
+  #   depends_on: 
+  #     - "application" 
 
-  scheduler: 
-    image: application
-    container_name: scheduler_w
-    environment:
-      CONTAINER_ROLE: scheduler
-    volumes:
-      - ./:/var/www/html
-    working_dir: /var/www/html  
-    networks: 
-      c-network:
-        ipv4_address: 21.1.0.105
-    depends_on: 
-      - "application" 
+  # scheduler: 
+  #   image: application
+  #   container_name: scheduler_w
+  #   environment:
+  #     CONTAINER_ROLE: scheduler
+  #   volumes:
+  #     - ./:/var/www/html
+  #   working_dir: /var/www/html  
+  #   networks: 
+  #     c-network:
+  #       ipv4_address: 21.1.0.105
+  #   depends_on: 
+  #     - "application" 
 
   redis:
     container_name: redis_w
@@ -108,8 +108,6 @@ services:
     container_name: websocket_w
     ports:
       - "6001"
-    volumes:
-      - '${PWD}/laravel-echo-server.json:/app/laravel-echo-server.json'
     working_dir: /app
     command: node server.js
     restart: always

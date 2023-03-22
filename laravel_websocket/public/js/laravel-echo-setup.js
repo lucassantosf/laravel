@@ -1741,24 +1741,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var laravel_echo__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! laravel-echo */ "./node_modules/laravel-echo/dist/echo.js");
 
 var host = document.currentScript.getAttribute('host');
-
-// window.Echo = new Echo({
-// 	broadcaster: 'socket.io',
-// 	host: host,
-// 	auth: {
-// 	  headers:
-// 		{
-// 		  'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('jwt')),
-// 		  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-// 		}
-// 	}
-// });
-
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'socket.io',
-  host: window.location.hostname + ":" + window.laravel_echo_port
+  host: "http://localhost:6001"
+  // auth: {
+  //   headers:
+  // 	{
+  // 	  'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('jwt')),
+  // 	  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+  // 	}
+  // }
 });
+
 console.log('socket conectado com sucesso!!!');
+
 /*
 Tutorial de base:
 https://raviyatechnical.medium.com/laravel-advance-laravel-broadcast-redis-socket-io-tutorial-4c7fa3b94101
