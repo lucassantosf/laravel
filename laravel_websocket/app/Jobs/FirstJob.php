@@ -32,6 +32,8 @@ class FirstJob extends Job
             
             $this->post->update(['status'=>!$this->post->status]);
 
+            event(new \App\Events\SendMessage('POST '.$this->post->id.' changed status to '.$this->post->status));
+
             DB::commit();
         } catch (\Throwable $th) {  
             DB::rollback();

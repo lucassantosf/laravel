@@ -17,6 +17,7 @@ class PostController extends Controller
     {
         try {
             $resource = Post::findorFail($id);
+
             dispatch(new FirstJob($resource));
 
             return response()->json(['success'=>true], 200); 

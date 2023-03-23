@@ -1,6 +1,10 @@
-# Todo Laravel V10 Boilerplate
+# Laravel V10 Boilerplate - WebSocket
 
-[OK] - Dockerfiles
+[OK] - Dockerfiles 
+
+        Websocket container running on port 6001 with Redis
+
+        It's necessary config nginx to allow 'stream'
 
 [OK] - Auth with Passport
 
@@ -15,7 +19,3 @@
 [OK] - Jobs example
 
 [OK] - Commands example
-
-[OK] - External Lib integration API
-
-[OK] - Tests Coverage example

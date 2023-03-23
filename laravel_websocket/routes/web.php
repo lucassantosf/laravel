@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/t', function () {
-    event(new \App\Events\SendMessage('mensagem teste'));
-    // dd('Event Run Successfully.');
+Route::get('send-message/{message}', function (Request $request) {
+    event(new \App\Events\SendMessage($request->message));
 });

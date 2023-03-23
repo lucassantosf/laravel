@@ -15,7 +15,6 @@ class SendMessage implements ShouldBroadcastNow
 {
 	use InteractsWithSockets, SerializesModels;
 	
-	public $data = ['asas'];
 	public $mensagem;
 	/**
 	 * Create a new event instance.
