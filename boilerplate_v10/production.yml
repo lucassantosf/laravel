@@ -13,6 +13,7 @@ services:
     volumes:
       - ./environment/nginx/default-nginx.conf:/etc/nginx/conf.d/default.conf
       - ./environment/nginx/nginx.conf:/etc/nginx/nginx.conf
+    restart: always
     networks: 
       application-network:
         ipv4_address: 18.1.0.101
@@ -32,6 +33,7 @@ services:
     command: php-fpm
     ports:
       - "9000"
+    restart: always
     networks: 
       application-network:
         ipv4_address: 18.1.0.102 
@@ -44,6 +46,7 @@ services:
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html  
+    restart: always
     networks: 
       application-network:
         ipv4_address: 18.1.0.103
@@ -58,6 +61,7 @@ services:
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html  
+    restart: always
     networks: 
       application-network:
         ipv4_address: 18.1.0.104
