@@ -6,7 +6,7 @@ services:
         context: .
         dockerfile: ./environment/nginx/Dockerfile
     image: ngnix
-    container_name: nginx___
+    container_name: nginx
     tty: true
     ports:
       - "8000:80"
@@ -34,17 +34,17 @@ services:
       - "9000"
     networks: 
       application-network:
-        ipv4_address: 18.1.0.102 
+        ipv4_address: 18.1.0.102
     depends_on: 
       - "mysql"
 
   mysql:
     image: mysql:5.7.22
     command: --max_allowed_packet=32505856
-    container_name: mysql___
+    container_name: mysql
     hostname: mysql
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} 
@@ -53,11 +53,11 @@ services:
       - ~/volumes/application/mysql/dump/:/docker-entrypoint-initdb.d/ 
     networks:
       application-network:
-        ipv4_address: 18.1.0.103 
+        ipv4_address: 18.1.0.103
 
   supervisor: 
     image: application
-    container_name: supervisor___
+    container_name: supervisor
     environment:
       CONTAINER_ROLE: default-queue  
     volumes:
@@ -71,7 +71,7 @@ services:
 
   scheduler: 
     image: application
-    container_name: scheduler___
+    container_name: scheduler
     environment:
       CONTAINER_ROLE: scheduler
     volumes:
