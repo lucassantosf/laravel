@@ -48,7 +48,9 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - ~/volumes/yetzlink/mysql/data/db/:/var/lib/mysql/
+      - ~/volumes/yetzlink/mysql/dump/:/docker-entrypoint-initdb.d/ 
     networks:
       application-network:
         ipv4_address: 10.1.0.13
