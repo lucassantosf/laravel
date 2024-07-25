@@ -25,6 +25,8 @@ services:
       dockerfile: ./environment/application/Dockerfile
     image: application
     container_name: application
+    environment:
+      CONTAINER_ROLE: app 
     volumes:
       - ./:/var/www/html
       - ./environment/custom.ini:/usr/local/etc/php/conf.d/custom.ini
@@ -81,7 +83,7 @@ services:
       application-network:
         ipv4_address: 20.1.0.15
     depends_on: 
-      - "application" 
+      - "mysql" 
 
 networks:
   application-network:

@@ -22,11 +22,6 @@ elif [ "$role" = "default-queue" ]; then
     echo "Running default queue..."
     php artisan queue:work --verbose --tries=1 --timeout=3600 --queue=DEFAULT
 
-elif [ "$role" = "recipiente-queue" ]; then
-
-    echo "Running recipiente queue..."
-    php artisan queue:work --verbose --tries=1 --timeout=3600 --queue=RECIPIENTE
-
 elif [ "$role" = "scheduler" ]; then
 
     while [ true ]

@@ -46,8 +46,8 @@ class RolesPermissionSeeder extends Seeder
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);
         $role->givePermissionTo(Permission::all());
 
-        $role_user = Role::create(['name' => 'cliente','guard_name'=>'api']);
-        $role_user->givePermissionTo(['usuario.me','usuario.logout']);
+        $role_user = Role::create(['name' => 'client','guard_name'=>'api']);
+        $role_user->givePermissionTo(['usuario.me','usuario.logout','post.index','post.show','post.store','post.update']);
 
         // Assign roles to users
         $users_admin = User::whereIn('id',[1])->get(); 

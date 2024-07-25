@@ -1,19 +1,27 @@
-# Laravel V10 Boilerplate
+# Laravel V11 Boilerplate
 
 [OK] - Dockerfiles
 
 [OK] - Auth with Passport
 
-[*] - Acl Laravel Spatie Permission
+[OK] - Acl Laravel Spatie Permission
 
 [OK] - Model Base to extend other models
 
-[] - CRUD Example based on model example
+[OK] - CRUD Example (Post) based on model example
 
-[] - Exports example
+[OK] - Exports example
 
-[] - Jobs example
+[OK] - Jobs example
 
-[] - Commands example
+[OK] - Commands example
 
-[] - Tests Coverage example
+    The commands files are located at /app/Console/Commands/
+
+    The scheduler is at routes/console.php
+
+[OK] - Tests Coverage example
+
+    To run, use: 
+
+    ./vendor/bin/phpunit

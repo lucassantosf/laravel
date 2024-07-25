@@ -13,7 +13,7 @@ Route::get('ping', function(){
 
 Route::post('/login', [AuthController::class,'login']);
 
-Route::group(['middleware'=>['auth:api'/*,'check_permission'*/]],function(){
+Route::group(['middleware'=>['auth:api','check_permission']],function(){
 
     Route::group(['prefix'=>'usuario','as'=>'usuario.'],function(){
         Route::get('me', [AuthController::class,'me'])->name('me');
