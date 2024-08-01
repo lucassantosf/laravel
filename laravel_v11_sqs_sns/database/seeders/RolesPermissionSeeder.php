@@ -43,6 +43,7 @@ class RolesPermissionSeeder extends Seeder
         Permission::create(['name'=>'document.validate','guard_name'=>'api']);
         Permission::create(['name'=>'debugs.sqs',       'guard_name'=>'api']);
         Permission::create(['name'=>'debugs.sns',       'guard_name'=>'api']);
+        Permission::create(['name'=>'debugs.event',     'guard_name'=>'api']);
         
         // Creating roles and sync permission to roles
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);

@@ -19,6 +19,7 @@ Route::group(['middleware'=>['auth:api','check_permission']],function(){
     Route::group(['prefix'=>'debugs','as'=>'debugs.'],function(){
         Route::get('sqs', [DebugController::class,'sqs'])->name('sqs');
         Route::get('sns', [DebugController::class,'sns'])->name('sns');
+        Route::get('event', [DebugController::class,'event'])->name('event');
     });
 
     Route::group(['prefix'=>'usuario','as'=>'usuario.'],function(){
