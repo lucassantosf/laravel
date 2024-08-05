@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('ping', function(){
-    return 'pong';
+    return 'pong sender';
 });
 
 Route::post('/login', [AuthController::class,'login']);
@@ -19,7 +19,7 @@ Route::group(['middleware'=>['auth:api','check_permission']],function(){
     Route::group(['prefix'=>'debugs','as'=>'debugs.'],function(){
         Route::get('sqs', [DebugController::class,'sqs'])->name('sqs');
         Route::get('sns', [DebugController::class,'sns'])->name('sns');
-        Route::get('event', [DebugController::class,'event'])->name('event');
+        Route::get('event', [DebugController::class,'event_2'])->name('event');
     });
 
     Route::group(['prefix'=>'usuario','as'=>'usuario.'],function(){

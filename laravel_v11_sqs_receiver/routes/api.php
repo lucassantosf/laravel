@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('ping', function(){
-    return 'pong';
+    return 'pong receiver';
 });
 
 Route::post('/login', [AuthController::class,'login']);

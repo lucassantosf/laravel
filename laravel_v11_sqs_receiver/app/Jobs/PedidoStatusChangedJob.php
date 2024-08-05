@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class ProcessEventJob implements ShouldQueue
+class PedidoStatusChangedJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -27,7 +27,7 @@ class ProcessEventJob implements ShouldQueue
         // Por exemplo, salvar dados no banco de dados ou chamar outro serviço
         DB::table('failed_jobs')->insert([
             'uuid' => Str::uuid(),
-            'connection' => 'test event',
+            'connection' => 'test event PedidoStatusChangedJob',
             'queue' => '',
             'payload' => json_encode($this->data),
             'exception' => '',

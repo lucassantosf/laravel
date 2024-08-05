@@ -1,12 +1,12 @@
 version: "3.3"
 
 services:
-  nginx:
+  nginx_sender:
     build: 
       context: .
       dockerfile: ./environment/nginx/Dockerfile
     image: ngnix
-    container_name: nginx
+    container_name: nginx_sender
     tty: true
     ports:
       - "8000:80"
@@ -15,18 +15,18 @@ services:
       - ./environment/nginx/nginx.conf:/etc/nginx/nginx.conf
     networks: 
       application-network:
-        ipv4_address: 20.1.0.11
+        ipv4_address: 30.1.0.11
     depends_on: 
-      - "application"
+      - "application_sender"
 
-  application:
+  application_sender:
     build:
       context: .
       dockerfile: ./environment/application/Dockerfile
-    image: application
-    container_name: application
+    image: application_sender
+    container_name: application_sender
     environment:
-      CONTAINER_ROLE: app 
+      CONTAINER_ROLE: app
     volumes:
       - ./:/var/www/html
       - ./environment/custom.ini:/usr/local/etc/php/conf.d/custom.ini
@@ -36,54 +36,40 @@ services:
       - "9000"
     networks: 
       application-network:
-        ipv4_address: 20.1.0.12
+        ipv4_address: 30.1.0.12
     depends_on: 
-      - "mysql"
+      - "mysql_sender"
 
-  mysql:
+  mysql_sender:
     image: mysql:8.0.36
     command: --max_allowed_packet=32505856
-    container_name: mysql
-    hostname: mysql
+    container_name: mysql_sender
+    hostname: mysql_sender
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - /home/lucas/volumes/project/mysql/data/db/:/var/lib/mysql/
-      - /home/lucas/volumes/project/mysql/dump/:/docker-entrypoint-initdb.d/ 
+      - /home/lucas/volumes/sender/mysql/data/db/:/var/lib/mysql/
+      - /home/lucas/volumes/sender/mysql/dump/:/docker-entrypoint-initdb.d/ 
     networks:
       application-network:
-        ipv4_address: 20.1.0.13
+        ipv4_address: 30.1.0.13
   
-  supervisor: 
-    image: application
-    container_name: supervisor
-    environment:
-      CONTAINER_ROLE: default-queue  
-    volumes:
-      - ./:/var/www/html
-    working_dir: /var/www/html  
-    networks: 
-      application-network:
-        ipv4_address: 20.1.0.14
-    depends_on: 
-      - "mysql" 
-
-  scheduler: 
-    image: application
-    container_name: scheduler
-    environment:
-      CONTAINER_ROLE: scheduler
-    volumes:
-      - ./:/var/www/html
-    working_dir: /var/www/html  
-    networks: 
-      application-network:
-        ipv4_address: 20.1.0.15
-    depends_on: 
-      - "mysql" 
+  # supervisor_sender: 
+  #   image: application_sender
+  #   container_name: supervisor_sender
+  #   environment:
+  #     CONTAINER_ROLE: default-queue  
+  #   volumes:
+  #     - ./:/var/www/html
+  #   working_dir: /var/www/html  
+  #   networks: 
+  #     application-network:
+  #       ipv4_address: 30.1.0.14
+  #   depends_on:
+  #     - "mysql_sender" 
 
 networks:
   application-network:
@@ -91,4 +77,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 20.1.0.0/24
+        - subnet: 30.1.0.0/24
