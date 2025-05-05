@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-
 set -e
 
 role=${CONTAINER_ROLE:-"app"}
 migration=${RUN_MIGRATIONS:-"false"}
 
-if [ "$role" = "app" ]; then
+# Espera pelo MySQL
+# Aguarda o MySQL estar aceitando conexões
+until mysqladmin ping -hmysql -uroot -p${DB_PASSWORD} --silent; do
+    echo "Aguardando o MySQL iniciar..."
+    sleep 2
+done
 
+if [ "$role" = "app" ]; then
     composer install
     composer update --no-plugins
 
@@ -14,18 +19,14 @@ if [ "$role" = "app" ]; then
         php artisan migrate
     fi
 
-    # sudo php artisan cache:clear
     exec php-fpm
 
 elif [ "$role" = "default-queue" ]; then
-
     echo "Running default queue..."
     php artisan queue:work --verbose --tries=1 --timeout=3600 --queue=DEFAULT
 
 elif [ "$role" = "scheduler" ]; then
-
-    while [ true ]
-    do
+    while true; do
       php artisan schedule:run --verbose --no-interaction &
       sleep 60
     done

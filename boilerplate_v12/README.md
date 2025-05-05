@@ -1,27 +1,31 @@
-# Laravel V11 Boilerplate
+# Laravel V12 Boilerplate
 
-[] - Dockerfiles
+[OK] - Dockerfiles
 
-[] - Auth with Passport
+[OK] - Auth with Passport
 
-[] - Acl Laravel Spatie Permission
+[OK] - Acl Laravel Spatie Permission
 
-[] - Model Base to extend other models
+[OK] - Model Base to extend other models
 
-[] - CRUD Example (Post) based on model example
+[OK] - CRUD Example (Post) based on model example
 
-[] - Exports example
+[OK] - Exports example
 
-[] - Jobs example
+[OK] - Jobs example
 
-[] - Commands example
+[OK] - Commands example
 
     The commands files are located at /app/Console/Commands/
 
     The scheduler is at routes/console.php
 
-[] - Tests Coverage example
+[OK] - Tests Coverage example
 
-    To run, use: 
+    First, execute mysql container only:
+
+    sudo docker compose up -d mysql
+
+    After, execute phpunit 
 
     ./vendor/bin/phpunit

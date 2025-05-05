@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -10,7 +13,7 @@ Route::get('ping', function(){
 
 Route::post('/login', [AuthController::class,'login']);
 
-Route::group(['middleware'=>['auth:api'/*,'check_permission'*/]],function(){
+Route::group(['middleware'=>['auth:api','check_permission']],function(){
 
     Route::group(['prefix'=>'usuario','as'=>'usuario.'],function(){
         Route::get('me', [AuthController::class,'me'])->name('me');

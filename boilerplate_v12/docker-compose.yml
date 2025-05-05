@@ -57,33 +57,33 @@ services:
       backend-network:
         ipv4_address: 20.1.0.13
   
-  # supervisor: 
-  #   image: backend
-  #   container_name: supervisor
-  #   environment:
-  #     CONTAINER_ROLE: default-queue  
-  #   volumes:
-  #     - ./:/var/www/html
-  #   working_dir: /var/www/html  
-  #   networks: 
-  #     backend-network:
-  #       ipv4_address: 20.1.0.14
-  #   depends_on: 
-  #     - "backend" 
+  supervisor: 
+    image: backend
+    container_name: supervisor
+    environment:
+      CONTAINER_ROLE: default-queue  
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      backend-network:
+        ipv4_address: 20.1.0.14
+    depends_on: 
+      - "backend" 
 
-  # scheduler: 
-  #   image: backend
-  #   container_name: scheduler
-  #   environment:
-  #     CONTAINER_ROLE: scheduler
-  #   volumes:
-  #     - ./:/var/www/html
-  #   working_dir: /var/www/html  
-  #   networks: 
-  #     backend-network:
-  #       ipv4_address: 20.1.0.15
-  #   depends_on: 
-  #     - "mysql" 
+  scheduler: 
+    image: backend
+    container_name: scheduler
+    environment:
+      CONTAINER_ROLE: scheduler
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html  
+    networks: 
+      backend-network:
+        ipv4_address: 20.1.0.15
+    depends_on: 
+      - "mysql" 
 
 networks:
   backend-network:

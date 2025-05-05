@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y \
     libldap2-dev \
     zip \
     unzip \
-    libzip-dev
+    libzip-dev \
+    default-mysql-client
 
 # Limpa o cache do apt-get para economizar espaço
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
