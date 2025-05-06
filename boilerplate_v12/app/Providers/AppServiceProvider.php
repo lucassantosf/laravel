@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Passport\Passport; // Adicionando a importação da classe Passport
+use Laravel\Passport\Passport;  
+use App\Repositories\Contracts\PostRepositoryInterface;
+use App\Repositories\PostRepository;
+use App\Services\Contracts\PostServiceInterface;
+use App\Services\PostService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +16,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(PostRepositoryInterface::class, PostRepository::class);
+        $this->app->bind(PostServiceInterface::class, PostService::class);
     }
 
     /**

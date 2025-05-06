@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class Post extends Base
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
 {
     protected $table = 'posts'; 
 
@@ -12,23 +14,6 @@ class Post extends Base
         'content',
         'status',
     ]; 
-
-    public static function arrValidation(){
-        return [
-            'user_id' => 'required|exists:users,id',
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'status' => 'required|boolean'
-        ];
-    } 
-
-    public static function arrUpdateValidation($id){
-        return [
-            'user_id' => 'required|exists:users,id',
-            'title' => 'required|string',
-            'content' => 'required|string',
-        ];
-    } 
 
     public function user()
     {

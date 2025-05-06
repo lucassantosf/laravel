@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Post; 
 use App\Jobs\FirstJob;
-use Illuminate\Http\Request; 
+use App\Services\Contracts\PostServiceInterface;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function __construct()
+    public function __construct(PostServiceInterface $service)
     {
-        $this->class = Post::class;   
-    } 
+        parent::__construct($service);
+    }
 
     public function job(Request $request, int $id)
     {

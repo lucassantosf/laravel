@@ -74,7 +74,7 @@ class User extends Authenticatable implements OAuthenticatable
         ];
     }
 
-    public static function index(Request $request){
+    /*public static function index(Request $request){
         return self::paginate(10);
     }
 
@@ -94,5 +94,5 @@ class User extends Authenticatable implements OAuthenticatable
         $user->fill($request->all());
         $user->save(); 
         return response()->json($user, 200);
-    }
+    }*/
 }
