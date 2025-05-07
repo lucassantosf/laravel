@@ -2,18 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\ExportPost;
+use App\Services\PostExportService;
 use Illuminate\Http\Request; 
-use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
+    protected $exportService;
+
+    public function __construct(PostExportService $exportService)
+    {
+        $this->exportService = $exportService;
+    }
+
     public function example(Request $request)
-    {  
+    {
         try {
-            return Excel::download(new ExportPost(),"Post_example.csv")->deleteFileAfterSend(false); 
+            return $this->exportService->exportExample($request);
         } catch (\Throwable $th) {
-            return response()->json(['message'=>$th->getMessage(),'success'=>false], 500);  
-        } 
+            return response()->json([
+                'message' => $th->getMessage(), 
+                'success' => false
+            ], 500);
+        }
     }
 }

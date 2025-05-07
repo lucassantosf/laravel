@@ -54,7 +54,7 @@ abstract class Controller extends BaseController
 
     public function update(Request $request, int $id)
     {
-        $validator = Validator::make($request->all(), $this->service->rules($id));
+        $validator = Validator::make($request->all(), $this->service->rules_update($id));
 
         if ($validator->fails())
             return response()->json($validator->messages(), 422);

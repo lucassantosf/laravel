@@ -49,4 +49,14 @@ class PostService implements PostServiceInterface
             'status' => 'required|boolean'
         ];
     }
+
+    public function rules_update(int $id = null): array
+    {
+        return [
+            'user_id' => 'exists:users,id',
+            'title' => 'string',
+            'content' => 'string',
+            'status' => 'boolean'
+        ];
+    }
 }

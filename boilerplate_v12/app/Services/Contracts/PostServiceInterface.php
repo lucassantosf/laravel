@@ -12,4 +12,5 @@ interface PostServiceInterface
     public function update(Request $request, int $id);
     public function destroy(int $id);
     public function rules(int $id = null): array;
+    public function rules_update(int $id = null): array;
 }
