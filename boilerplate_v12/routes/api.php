@@ -3,6 +3,7 @@
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GeminiAiController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
@@ -19,6 +20,12 @@ Route::group(['prefix'=>'appointment','as'=>'appointment.'],function(){
         Route::post('', 'store')->name('store'); 
         Route::post('{id}', 'update')->name('update'); 
         Route::delete('{id}', 'destroy')->name('destroy'); 
+    });
+});
+
+Route::group(['prefix'=>'gemini','as'=>'gemini.'],function(){
+    Route::group(['controller'=>GeminiAiController::class],function(){
+        Route::post('chat', 'chat')->name('chat'); 
     });
 });
 
