@@ -24,7 +24,7 @@ class GeminiAiClient
 
         $payload = ['contents' => $prompt];
         if ($tools !== null) {
-            $payload['tools'] = $tools;
+            $payload['tools'] = $this->getTools();
         }
 
         try {
@@ -37,7 +37,6 @@ class GeminiAiClient
 
             $statusCode = $response->getStatusCode();
             $body = $response->getBody()->getContents();
-
             if ($statusCode >= 200 && $statusCode < 300) {
                 return json_decode($body, true);
             } else {
@@ -46,8 +45,35 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
-            error_log("Erro na chamada da API do Gemini (Guzzle): " . $e->getMessage());
-            return null;
+            return $e->getMessage();
         }
+    }
+
+    private function getTools(): array
+    {
+        return [
+            'functionDeclarations' => [
+                [
+                    'name' => 'listAvailability',
+                    'description' => 'Return all available time for next 3 days'
+                ],
+                [
+                    'name' => 'findAppointment',
+                    'description' => 'Search for appointments made by a client. Accepts name or document',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'document' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                        'required' => ['name'],
+                    ],
+                ],
+            ],
+        ];
     }
 }
