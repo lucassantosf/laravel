@@ -18,14 +18,12 @@ class GeminiAiClient
         $this->httpClient = $httpClient ?? new Client();
     }
 
-    public function generateContent(array $prompt, ?array $tools = null): ?array
+    public function generateContent(array $prompt): ?array
     {
         $url = $this->baseUrl . $this->modelName . ':generateContent?key=' . $this->apiKey;
 
         $payload = ['contents' => $prompt];
-        if ($tools !== null) {
-            $payload['tools'] = $this->getTools();
-        }
+        $payload['tools'] = $this->getTools();
 
         try {
             $response = $this->httpClient->post($url, [
@@ -45,7 +43,8 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
-            return $e->getMessage();
+            error_log("Erro na chamada da API do Gemini: " . $e->getMessage());
+            return null;
         }
     }
 

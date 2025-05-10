@@ -13,4 +13,31 @@ class AppointmentController extends Controller
     {
         parent::__construct($service);
     }
+
+    public function search(Request $request)
+    {
+        try {
+            $search = $request->query('search');    
+            if (!$search) {
+                return response()->json(['message' => 'Campo de pesquisa não informado.'], 400);
+            }
+
+            $resource = $this->service->search($search);
+            return response()->json(['data'=>$resource,'success'=>true], 200); 
+        } catch (\Throwable $th) {
+            return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
+        } 
+    } 
+
+    public function cancel(Request $request)
+    {
+        try {
+            $resource = $this->service->cancel($request->id);
+            return response()->json(['success'=>true], 200); 
+        } catch (\Throwable $th) {
+            return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
+        } 
+    }
+ 
+
 }

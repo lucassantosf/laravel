@@ -20,6 +20,12 @@ class AppointmentService implements AppointmentServiceInterface
         return $this->getAvailableSlots($request);
     }
 
+    public function search(string $search)
+    {
+        $resource = $this->appointmentRepository->search($search);
+        return $resource;
+    }
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -55,7 +61,11 @@ class AppointmentService implements AppointmentServiceInterface
 
     public function cancel(int $id)
     {
-        return $this->appointmentRepository->delete($id);
+        $appointment = $this->appointmentRepository->find($id);
+        if (!$appointment) {
+            return response()->json(['message' => 'Agendamento não encontrado.'], 404);
+        }
+        return $this->appointmentRepository->destroy($id);
     }
 
     public function rules(int $id = null): array

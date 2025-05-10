@@ -19,6 +19,20 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return $query->orderBy('id', 'desc')->paginate(10);
     }
 
+    public function search(string $search)
+    {
+        $query = Appointment::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('document', 'like', "%$search%");
+            });
+        }
+
+        return $query->first();
+    }
+
     public function find(int $id)
     {
         return Appointment::findOrFail($id);
@@ -29,7 +43,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return Appointment::create($data);
     }
 
-    public function destroy(array $data)
+    public function destroy(int $id)
     {
         $post = Appointment::findOrFail($id);
         $post->delete();

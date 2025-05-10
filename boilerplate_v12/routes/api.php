@@ -16,10 +16,10 @@ Route::get('ping', function(){
 Route::group(['prefix'=>'appointment','as'=>'appointment.'],function(){
     Route::group(['controller'=>AppointmentController::class],function(){
         Route::get('', 'index')->name('index'); 
-        Route::get('{id}', 'show')->name('show'); 
+        Route::get('search', 'search')->name('search'); 
         Route::post('', 'store')->name('store'); 
         Route::post('{id}', 'update')->name('update'); 
-        Route::delete('{id}', 'destroy')->name('destroy'); 
+        Route::delete('{id}', 'cancel')->name('cancel'); 
     });
 });
 
