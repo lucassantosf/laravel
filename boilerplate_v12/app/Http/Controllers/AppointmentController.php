@@ -32,12 +32,11 @@ class AppointmentController extends Controller
     public function cancel(Request $request)
     {
         try {
-            $resource = $this->service->cancel($request->id);
+            $this->service->cancel($request->id);
             return response()->json(['success'=>true], 200); 
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage(),'success'=>false], 500); 
         } 
-    }
- 
+    } 
 
 }

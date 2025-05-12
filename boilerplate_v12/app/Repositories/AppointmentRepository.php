@@ -3,18 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\Appointment;
-use Illuminate\Http\Request;
 use App\Repositories\Contracts\AppointmentRepositoryInterface;
+use Carbon\Carbon;
 
 class AppointmentRepository implements AppointmentRepositoryInterface
 {
-    public function all(Request $request)
+    public function all()
     {
         $query = Appointment::query();
-
-        foreach ($request->query() as $key => $value) {
-            $query->where($key, $value);
-        }
 
         return $query->orderBy('id', 'desc')->paginate(10);
     }
@@ -30,6 +26,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             });
         }
 
+        $query = $query->where('datetime','>',Carbon::now());
+
         return $query->first();
     }
 
@@ -41,6 +39,13 @@ class AppointmentRepository implements AppointmentRepositoryInterface
     public function create(array $data)
     {
         return Appointment::create($data);
+    }
+
+    public function update(array $data,int $id)
+    {
+        $appointment = Appointment::findOrFail($id);
+        $appointment->fill($data)->save();
+        return $appointment;
     }
 
     public function destroy(int $id)

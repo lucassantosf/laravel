@@ -12,7 +12,7 @@ class GeminiAiClient
     private string $apiKey;
     private Client $httpClient;
 
-    public function __construct(Client $httpClient = null)
+    public function __construct()
     {
         $this->apiKey = env('GEMINI_API_KEY');
         $this->httpClient = $httpClient ?? new Client();
@@ -62,14 +62,68 @@ class GeminiAiClient
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
+                            'search' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                        'required' => ['search'],
+                    ],
+                ],
+                [
+                    'name' => 'makeAppointment',
+                    'description' => 'Creates an appointment in our clinic. Its necessary inform name , document and datetime to schedule the appointment',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
                             'name' => [
                                 'type' => 'string',
                             ],
                             'document' => [
                                 'type' => 'string',
                             ],
+                            'datetime' => [
+                                'type' => 'string',
+                            ],
                         ],
-                        'required' => ['name'],
+                        'required' => ['name','document','datetime'],
+                    ],
+                ],
+                [
+                    'name' => 'updateAppointment',
+                    'description' => 'Updates an appointment in our clinic that has already been scheduled. Its necessary inform name , document and datetime to schedule the appointment',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'document' => [
+                                'type' => 'string',
+                            ],
+                            'datetime' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                        'required' => ['name','document','datetime'],
+                    ],
+                ],
+                [
+                    'name' => 'cancelAppointment',
+                    'description' => 'Cancel an appointment in our clinic that has already been scheduled',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'document' => [
+                                'type' => 'string',
+                            ],
+                            'datetime' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                        'required' => ['name','document','datetime'],
                     ],
                 ],
             ],

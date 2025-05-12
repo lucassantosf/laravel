@@ -21,15 +21,16 @@ class GeminiAiController extends Controller
     {
         $geminiClient = new GeminiAiClient();
 
-        $promptUsuario = $request->input('prompt');
+        $promp = $request->input('prompt');
         $userId = 1;
         $cacheKey = 'prompt_history_' . $userId;
-        // Cache::forget($cacheKey);
-        // dd('d');
+
+        // Cache::forget($cacheKey);dd('d');
+
         $historico = Cache::get($cacheKey, []);
 
-        if ($promptUsuario) {
-            $historico[] = ['role' => 'user', 'parts' => [['text' => $promptUsuario]]];
+        if ($promp) {
+            $historico[] = ['role' => 'user', 'parts' => [['text' => $promp]]];
         }
 
         $responseGemini = $geminiClient->generateContent($historico);
@@ -44,6 +45,27 @@ class GeminiAiController extends Controller
             $historico[] = $respostaModelo;
 
             switch ($functionCall["name"]) {
+                case 'listAvailability':
+                    $functionResponse = $this->service->index();
+
+                    $respostaModelo = ['role' => 'user', 'parts' => [
+                        [
+                            'functionResponse' => [
+                                'name' => $functionCall["name"],
+                                'response' => ['text' => json_encode($functionResponse)]
+                            ]
+                        ]
+                    ]];
+
+                    $historico[] = $respostaModelo;
+                    $responseGemini = $geminiClient->generateContent($historico); 
+
+                    if ($responseGemini !== null && isset($responseGemini['candidates'][0]['content']['parts'][0]['text'])) {
+                        $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
+                        $historico[] = $respostaModelo; 
+                    } 
+
+                    break;
                 case 'findAppointment':
 
                     $functionResponse = $this->service->search($functionCall["args"]["name"]);
@@ -68,7 +90,7 @@ class GeminiAiController extends Controller
                     break;
 
                 default:
-                    # code...
+                    dd("not implemented",$functionCall);
                     break;
             }
         }

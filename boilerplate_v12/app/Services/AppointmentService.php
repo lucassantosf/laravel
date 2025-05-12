@@ -15,9 +15,9 @@ class AppointmentService implements AppointmentServiceInterface
         $this->appointmentRepository = $appointmentRepository;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        return $this->getAvailableSlots($request);
+        return $this->getAvailableSlots();
     }
 
     public function search(string $search)
@@ -54,9 +54,33 @@ class AppointmentService implements AppointmentServiceInterface
         return $this->appointmentRepository->create($data);
     }
 
-    public function show(Request $request, int $id)
+    public function update(Request $request, int $id)
     {
-        return $this->appointmentRepository->find($id);
+        $appointment = $this->appointmentRepository->find($id);
+        if (!$appointment) {
+            return response()->json(['message' => 'Agendamento não encontrado.'], 404);
+        }
+        $requestedDateTime = $request->datetime ?? null;
+
+        // Validate if time is available 
+        // Gera todos os horários disponíveis
+        $availabilities = $this->generateNextAvailabities();
+    
+        // Verifica se o horário enviado na request é um horário permitido
+        if (!in_array($requestedDateTime, $availabilities)) {
+            return response()->json(['message' => 'Horário inválido.'], 422);
+        }
+    
+        // Pega todos os horários já agendados
+        $appointments = $this->appointmentRepository->all($request)->getCollection()->toArray();
+        $bookedDates = array_column($appointments, 'datetime');
+    
+        // Verifica se já foi reservado
+        if (in_array($requestedDateTime, $bookedDates)) {
+            return response()->json(['message' => 'Horário já reservado.'], 409);
+        }
+
+        return $this->appointmentRepository->update($request->all(),$id);
     }
 
     public function cancel(int $id)
@@ -68,12 +92,19 @@ class AppointmentService implements AppointmentServiceInterface
         return $this->appointmentRepository->destroy($id);
     }
 
-    public function rules(int $id = null): array
+    public function rules(): array
     {
         return [
             'document' => 'required',
             'name' => 'required',
-            'datetime' => 'required',
+            'datetime' => 'required|date_format:Y-m-d H:i:s',
+        ];
+    }
+
+    public function rules_update(int $id): array
+    {
+        return [
+            'datetime' => 'date_format:Y-m-d H:i:s',
         ];
     }
 
@@ -81,9 +112,9 @@ class AppointmentService implements AppointmentServiceInterface
      * Retorna os horários disponíveis para agendamento baseado nos horários já agendados
      * e nos horários fixos de 10h as 18h
      */
-    private function getAvailableSlots(Request $request): array
+    private function getAvailableSlots(): array
     {
-        $appointments = $this->appointmentRepository->all($request)->getCollection()->toArray();
+        $appointments = $this->appointmentRepository->all()->getCollection()->toArray();
         $bookedDates = array_column($appointments, 'datetime');
         $availabilities = $this->generateNextAvailabities();
 
