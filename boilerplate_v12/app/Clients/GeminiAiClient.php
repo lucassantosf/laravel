@@ -22,7 +22,12 @@ class GeminiAiClient
     {
         $url = $this->baseUrl . $this->modelName . ':generateContent?key=' . $this->apiKey;
 
-        $payload = ['contents' => $prompt];
+        $payload = [
+            'contents' => $prompt,
+            'generationConfig' => [
+                'temperature' => 0,
+            ],
+        ];
         $payload['tools'] = $this->getTools();
 
         try {
@@ -43,6 +48,8 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
+            // dd(json_encode($payload));
+            dd($payload,$e->getMessage());
             error_log("Erro na chamada da API do Gemini: " . $e->getMessage());
             return null;
         }

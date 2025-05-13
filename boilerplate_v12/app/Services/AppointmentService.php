@@ -26,9 +26,8 @@ class AppointmentService implements AppointmentServiceInterface
         return $resource;
     }
 
-    public function store(Request $request)
+    public function store(array $data)
     {
-        $data = $request->all();
         $requestedDateTime = $data['datetime'] ?? null;
     
         if (!$requestedDateTime) {
@@ -43,7 +42,7 @@ class AppointmentService implements AppointmentServiceInterface
         }
     
         // Pega todos os horários já agendados
-        $appointments = $this->appointmentRepository->all($request)->getCollection()->toArray();
+        $appointments = $this->appointmentRepository->all()->getCollection()->toArray();
         $bookedDates = array_column($appointments, 'datetime');
     
         // Verifica se já foi reservado
@@ -54,33 +53,43 @@ class AppointmentService implements AppointmentServiceInterface
         return $this->appointmentRepository->create($data);
     }
 
-    public function update(Request $request, int $id)
+    public function update(array $data)
     {
-        $appointment = $this->appointmentRepository->find($id);
-        if (!$appointment) {
-            return response()->json(['message' => 'Agendamento não encontrado.'], 404);
-        }
-        $requestedDateTime = $request->datetime ?? null;
+        $name = $data['name'] ?? null;
+        $document = $data['document'] ?? null;
+        $requestedDateTime = $data['datetime'] ?? null;
 
-        // Validate if time is available 
-        // Gera todos os horários disponíveis
+        if (!$name && !$document) {
+            return response()->json(['message' => 'Nome ou documento do agendamento a ser alterado não informado.'], 400);
+        }
+
+        $search = $document ? $document : $name;
+
+        $resource = $this->appointmentRepository->search($search);
+
+        if (!$resource) {
+            return response()->json(['message' => 'Agendamento não encontrado com os dados fornecidos.'], 404);
+        }
+
+        $requestedDateTime = $data['datetime'] ?? null;
+        if (!$requestedDateTime) {
+            return response()->json(['message' => 'Novo horário não informado.'], 400);
+        }
+
         $availabilities = $this->generateNextAvailabities();
-    
-        // Verifica se o horário enviado na request é um horário permitido
         if (!in_array($requestedDateTime, $availabilities)) {
-            return response()->json(['message' => 'Horário inválido.'], 422);
-        }
-    
-        // Pega todos os horários já agendados
-        $appointments = $this->appointmentRepository->all($request)->getCollection()->toArray();
-        $bookedDates = array_column($appointments, 'datetime');
-    
-        // Verifica se já foi reservado
-        if (in_array($requestedDateTime, $bookedDates)) {
-            return response()->json(['message' => 'Horário já reservado.'], 409);
+            return response()->json(['message' => 'Novo horário inválido.'], 422);
         }
 
-        return $this->appointmentRepository->update($request->all(),$id);
+        // Pega todos os horários já agendados (excluindo o atual que estamos editando)
+        $bookedDatesQuery = $this->appointmentRepository->all()->where('id', '!=', $resource->id);
+        $bookedDates = $bookedDatesQuery->get()->pluck('datetime')->toArray();
+
+        if (in_array($requestedDateTime, $bookedDates)) {
+            return response()->json(['message' => 'Novo horário já reservado.'], 409);
+        }
+
+        return $this->appointmentRepository->update($data, $resource->id);
     }
 
     public function cancel(int $id)
