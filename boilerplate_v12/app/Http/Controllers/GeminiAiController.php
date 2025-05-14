@@ -137,8 +137,11 @@ class GeminiAiController extends Controller
 
                     break;
                 case 'findAppointment':
-
-                    $functionResponse = $this->service->search($functionCall["args"]["search"]);
+                    $args = $functionCall["args"];
+                    
+                    $search = $args['document'] ?? $args['name'] ?? null;
+                    
+                    $functionResponse = $this->service->search($search);
 
                     $respostaModelo = ['role' => 'user', 'parts' => [
                         [
@@ -219,6 +222,86 @@ class GeminiAiController extends Controller
                         $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
                         $historico[] = $respostaModelo;
                     }
+
+                    break;
+                case 'cancelAppointment':
+
+                    $args = $functionCall["args"];
+
+                    // Normalização da data e hora (similar ao makeAppointment)
+                    if (isset($args['datetime'])) {
+                        $dateTime = null;
+                        $formats = ['d/m/Y H:i', 'Y-m-d H:i:s', 'Y-m-d H:i', 'd/m/Y H:00'];
+                        foreach ($formats as $format) {
+                            $parsedDateTime = \DateTime::createFromFormat($format, $args['datetime']);
+                            if ($parsedDateTime) {
+                                $dateTime = $parsedDateTime->format('Y-m-d H:i:s');
+                                break;
+                            }
+                        }
+                        if ($dateTime) {
+                            $args['datetime'] = $dateTime;
+                        } else {
+                            $functionResponse = ['message' => 'Formato de data e hora inválido. Por favor, informe no formato DD/MM/AAAA HH:MM.'];
+                            $respostaModeloParaUsuario = ['role' => 'user', 'parts' => [['functionResponse' => ['name' => $functionCall["name"], 'response' => ['text' => json_encode($functionResponse)]]]]];
+                            $historico[] = $respostaModeloParaUsuario;
+                            $responseGemini = $geminiClient->generateContent($historico);
+                            if ($responseGemini !== null && isset($responseGemini['candidates'][0]['content']['parts'][0]['text'])) {
+                                $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
+                                $historico[] = $respostaModelo;
+                            }
+                            break;
+                        }
+                    } else {
+                        $functionResponse = ['message' => 'Por favor, informe a nova data e hora para o agendamento (formato DD/MM/AAAA HH:MM).'];
+                        $respostaModeloParaUsuario = ['role' => 'user', 'parts' => [['functionResponse' => ['name' => $functionCall["name"], 'response' => ['text' => json_encode($functionResponse)]]]]];
+                        $historico[] = $respostaModeloParaUsuario;
+                        $responseGemini = $geminiClient->generateContent($historico);
+                        if ($responseGemini !== null && isset($responseGemini['candidates'][0]['content']['parts'][0]['text'])) {
+                            $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
+                            $historico[] = $respostaModelo;
+                        }
+                        break;
+                    }
+
+                    // Sanitização básica
+                    $args['name'] = trim(strip_tags($args['name'] ?? ''));
+                    $args['document'] = preg_replace('/[^0-9.-]/', '', $args['document'] ?? '');
+
+                    $search = $args['document'] ?? $args['name'] ?? null;
+                    
+                    $functionResponse = $this->service->search($search);
+
+                    if(!$functionResponse) {
+                        $functionResponse = ['message' => 'Agendamento não encontrado com os dados fornecidos.'];
+                        $respostaModeloParaUsuario = ['role' => 'user', 'parts' => [['functionResponse' => ['name' => $functionCall["name"], 'response' => ['text' => json_encode($functionResponse)]]]]];
+                        $historico[] = $respostaModeloParaUsuario;
+                        $responseGemini = $geminiClient->generateContent($historico);
+                        if ($responseGemini !== null && isset($responseGemini['candidates'][0]['content']['parts'][0]['text'])) {
+                            $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
+                            $historico[] = $respostaModelo;
+                        }
+                        break;
+                    }
+
+                    $functionResponse = $this->service->cancel($functionResponse->id);  
+
+                    $respostaModelo = ['role' => 'user', 'parts' => [
+                        [
+                            'functionResponse' => [
+                                'name' => $functionCall["name"],
+                                'response' => ['text' => json_encode($functionResponse)]
+                            ]
+                        ]
+                    ]];
+
+                    $historico[] = $respostaModelo;
+                    $responseGemini = $geminiClient->generateContent($historico);
+
+                    if ($responseGemini !== null && isset($responseGemini['candidates'][0]['content']['parts'][0]['text'])) {
+                        $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
+                        $historico[] = $respostaModelo;
+                    } 
 
                     break;
                 default:

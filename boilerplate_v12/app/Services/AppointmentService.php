@@ -26,8 +26,16 @@ class AppointmentService implements AppointmentServiceInterface
         return $resource;
     }
 
-    public function store(array $data)
+    public function store(Request|array $data)
     {
+        if ($data instanceof Request) {
+            $data = $data->all();
+        } elseif (is_array($data)) {
+            $data = $data;
+        } else {
+            throw new \InvalidArgumentException('O argumento deve ser uma instância de Request ou um array.');
+        }
+
         $requestedDateTime = $data['datetime'] ?? null;
     
         if (!$requestedDateTime) {
@@ -53,8 +61,16 @@ class AppointmentService implements AppointmentServiceInterface
         return $this->appointmentRepository->create($data);
     }
 
-    public function update(array $data)
+    public function update(Request|array $data)
     {
+        if ($data instanceof Request) {
+            $data = $data->all();
+        } elseif (is_array($data)) {
+            $data = $data;
+        } else {
+            throw new \InvalidArgumentException('O argumento deve ser uma instância de Request ou um array.');
+        }
+
         $name = $data['name'] ?? null;
         $document = $data['document'] ?? null;
         $requestedDateTime = $data['datetime'] ?? null;
@@ -82,8 +98,8 @@ class AppointmentService implements AppointmentServiceInterface
         }
 
         // Pega todos os horários já agendados (excluindo o atual que estamos editando)
-        $bookedDatesQuery = $this->appointmentRepository->all()->where('id', '!=', $resource->id);
-        $bookedDates = $bookedDatesQuery->get()->pluck('datetime')->toArray();
+        $bookedDatesQuery = $this->appointmentRepository->all()->where('id', '!=', $resource->id);//dd($bookedDatesQuery);
+        $bookedDates = $bookedDatesQuery->pluck('datetime')->toArray();
 
         if (in_array($requestedDateTime, $bookedDates)) {
             return response()->json(['message' => 'Novo horário já reservado.'], 409);

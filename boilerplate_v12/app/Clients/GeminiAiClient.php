@@ -48,8 +48,7 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
-            // dd(json_encode($payload));
-            dd($payload,$e->getMessage());
+            // dd($payload,$e->getMessage());
             error_log("Erro na chamada da API do Gemini: " . $e->getMessage());
             return null;
         }
@@ -65,15 +64,20 @@ class GeminiAiClient
                 ],
                 [
                     'name' => 'findAppointment',
-                    'description' => 'Search for appointments made by a client. Accepts name or document',
+                    'description' => 'Search for appointments by name or document',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
-                            'search' => [
+                            'name' => [
                                 'type' => 'string',
+                                'description' => 'Client name',
+                            ],
+                            'document' => [
+                                'type' => 'string',
+                                'description' => 'Client document',
                             ],
                         ],
-                        'required' => ['search'],
+                        'required' => [],
                     ],
                 ],
                 [

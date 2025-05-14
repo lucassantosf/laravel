@@ -6,7 +6,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\GeminiAiController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReportController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('ping', function(){
