@@ -7,6 +7,7 @@ interface AppointmentServiceInterface
     public function index();
     public function store(array $data);
     public function update(array $data);
+    public function search(string $search);
     public function cancel(int $id);
     public function rules(): array;
     public function rules_update(int $id): array;

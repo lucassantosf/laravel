@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Services\Contracts\AppointmentServiceInterface;
 use App\Repositories\Contracts\AppointmentRepositoryInterface;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AppointmentService implements AppointmentServiceInterface
 {
@@ -154,18 +155,42 @@ class AppointmentService implements AppointmentServiceInterface
     private function generateNextAvailabities()
     {
         $slots = [];
-        $startHour = 10;
-        $endHour = 18;
-    
+        $startHourClinic = 10; // Horário de abertura da clínica
+        $endHourClinic = 18;   // Horário de fechamento da clínica
+
+        // --- Para o dia atual ---
+        $now = Carbon::now();
+        // Buffer de 1 hora: agendamentos devem ser daqui a pelo menos 1 hora e no próximo bloco de 30 ou 60 minutos
+        $nextAvailableTime = $now->copy()->addHour();
+        // Arredonda para a próxima hora cheia se necessário ou considera blocos de 30 min se preferir
+        if ($nextAvailableTime->minute > 0 && $nextAvailableTime->minute <= 30) {
+            $nextAvailableTime->minute(30)->second(0);
+        } else if ($nextAvailableTime->minute > 30) {
+             $nextAvailableTime->addHour()->minute(0)->second(0);
+        } else {
+            $nextAvailableTime->minute(0)->second(0);
+        } 
+
+        // Garante que o horário de início do dia atual não é antes do horário de abertura da clínica
+        $currentDayStartHour = max($startHourClinic, $nextAvailableTime->hour);
+
+        for ($hour = $currentDayStartHour; $hour <= $endHourClinic; $hour++) {
+            $slotTime = Carbon::parse($now->format('Y-m-d') . ' ' . str_pad($hour, 2, '0', STR_PAD_LEFT) . ':00:00');
+            // Adiciona o slot apenas se for depois do nosso buffer de 1 hora do tempo atual
+            if ($slotTime->greaterThanOrEqualTo($nextAvailableTime)) {
+                $slots[] = $slotTime->format('Y-m-d H:i:s');
+            }
+        }
+
+        // --- Para os próximos 3 dias ---
         for ($i = 1; $i <= 3; $i++) {
-            $date = date('Y-m-d', strtotime("+$i days"));
-    
-            for ($hour = $startHour; $hour <= $endHour; $hour++) {
+            $date = Carbon::now()->addDays($i)->format('Y-m-d');
+
+            for ($hour = $startHourClinic; $hour <= $endHourClinic; $hour++) {
                 $slots[] = "$date " . str_pad($hour, 2, '0', STR_PAD_LEFT) . ":00:00";
             }
         }
     
         return $slots;
     }
-}
- 
+} 
