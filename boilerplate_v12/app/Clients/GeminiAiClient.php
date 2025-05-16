@@ -49,10 +49,7 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
-            dd(json_encode($payload));
-            dd($payload,$e->getMessage());
-            error_log("Erro na chamada da API do Gemini: " . $e->getMessage());
-            return null;
+            throw $e;
         }
     }
 
