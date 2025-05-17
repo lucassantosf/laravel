@@ -49,6 +49,8 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
+            // dd(json_encode(($payload)));
+            dd($e->getMessage());
             throw $e;
         }
     }
@@ -109,8 +111,9 @@ class GeminiAiClient
 
             ## ADDITIONAL INSTRUCTIONS
 
-            - Prioritize **confirming existing appointments** if the user expresses this intention.
             - If an appointment is not found, **offer options to schedule a new one** or suggest the user try again with different information.
+            - Don't confirm user intentions, just execute the tool call.
+            - Before scheduling an appointment, **always check the availability of the new date and time**.
         ";
     }
 
@@ -153,7 +156,7 @@ class GeminiAiClient
                                 'type' => 'string',
                             ],
                             'datetime' => [
-                                'type' => 'string',
+                                'type' => 'string',//
                             ],
                         ],
                         'required' => ['name','document','datetime'],
@@ -184,17 +187,11 @@ class GeminiAiClient
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
-                            'name' => [
-                                'type' => 'string',
-                            ],
-                            'document' => [
-                                'type' => 'string',
-                            ],
-                            'datetime' => [
-                                'type' => 'string',
-                            ],
+                            'id' => [
+                                'type' => 'integer',
+                            ] 
                         ],
-                        'required' => ['name','document','datetime'],
+                        'required' => ['id'],
                     ],
                 ],
             ],

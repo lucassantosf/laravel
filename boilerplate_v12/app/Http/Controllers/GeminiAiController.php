@@ -20,47 +20,108 @@ class GeminiAiController extends Controller
     }
 
     public function chat(Request $request)
-    {
-        // Get user input and history
-        $prompt = $request->input('prompt');
-        $userId = $request->input('user_id', 1); // Default to user 1 if not provided
+    { 
+        $geminiClient = new GeminiAiClient();
+
+        $promp = $request->input('prompt');
+        $userId = 1;
         $cacheKey = 'prompt_history_' . $userId;
-        
-        // Clear history if requested
-        if ($request->input('clear')) {
+
+        if($request->input('clear')) {
             Cache::forget($cacheKey);
-            return response()->json(['message' => 'Conversation history cleared']);
         }
-        
-        // Get conversation history from cache
-        $history = Cache::get($cacheKey, []);
-        
-        // Add user message to history if provided
-        if ($prompt) {
-            $history[] = ['role' => 'user', 'parts' => [['text' => $prompt]]];
+
+        $historico = Cache::get($cacheKey, []);
+
+        if ($promp) {
+            $historico[] = ['role' => 'user', 'parts' => [['text' => $promp]]];
         }
-        
-        try {
-            // Generate response from Gemini
-            $responseData = $this->generateResponse($history);
-            
-            // Save updated history to cache (5 minutes expiration)
-            if (!empty($responseData['history'])) {
-                Cache::put($cacheKey, $responseData['history'], 60 * 5);
+
+        do {
+            $responseGemini = $geminiClient->generateContent($historico);
+            $respostaModelo = null;
+            if ($responseGemini !== null && (isset($responseGemini['candidates'][0]['content']['parts'][0]['functionCall']) 
+                || isset($responseGemini['candidates'][0]['content']['parts'][1]['functionCall']))) {
+
+                $functionCall = $responseGemini['candidates'][0]['content']['parts'][0]['functionCall'] ?? $responseGemini['candidates'][0]['content']['parts'][1]['functionCall'];
+                
+                $functionCallPart = ['functionCall' => ['name' => $functionCall['name']]];
+                if (!empty($functionCall['args'])) {
+                    $functionCallPart['functionCall']['args'] = $functionCall['args'];
+                }
+
+                $respostaModelo = ['role' => 'model', 'parts' => [$functionCallPart]];
+                $historico[] = $respostaModelo;
+                    
+                switch ($functionCall["name"]) {
+                    case 'listAvailability':
+                        $functionResponse = $this->service->index(); 
+
+                        break;
+                    case 'makeAppointment':
+
+                        $args = $functionCall["args"];
+
+                        $args['name'] = trim(strip_tags($args['name'] ?? ''));
+                        $args['document'] = preg_replace('/[^0-9.-]/', '', $args['document'] ?? '');
+
+                        $functionResponse = $this->service->store($args); 
+
+                        break;
+                    case 'findAppointment':
+                        $args = $functionCall["args"];
+                        
+                        $search = $args['document'] ?? $args['name'] ?? null;
+
+                        $functionResponse = $this->service->search($search); 
+
+                        break;
+                    case 'updateAppointment':
+                        $args = $functionCall["args"];
+
+                        $args['name'] = trim(strip_tags($args['name'] ?? ''));
+                        $args['document'] = preg_replace('/[^0-9.-]/', '', $args['document'] ?? '');
+
+                        $functionResponse = $this->service->update($args); 
+
+                        break;
+                    case 'cancelAppointment':
+
+                        $args = $functionCall["args"]; 
+
+                        $functionResponse = $this->service->cancel($args['id']);   
+
+                        break;
+                    default:
+                        dd("not implemented",$functionCall);
+                        break;
+                }
+
+                $respostaModelo = ['role' => 'user', 'parts' => [
+                    [
+                        'functionResponse' => [
+                            'name' => $functionCall["name"],
+                            'response' => ['text' => json_encode($functionResponse)]
+                        ]
+                    ]
+                ]]; 
+
+                $historico[] = $respostaModelo;
+                $responseGemini = $geminiClient->generateContent($historico); 
             }
-            
-            return response()->json($responseData);
-        } catch (\Exception $e) {
-            Log::error('Error processing request', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return response()->json([
-                'error' => 'Error processing request',
-                'message' => $e->getMessage()
-            ], 500);
+
+        } while ( isset($responseGemini['candidates'][0]['content']['parts'][0]['functionCall']) );
+
+        if (isset($responseGemini['candidates'][0]['content']['parts'][0]['text'])) {
+            $respostaModelo = ['role' => 'model', 'parts' => [['text' => $responseGemini['candidates'][0]['content']['parts'][0]['text']]]];
+            $historico[] = $respostaModelo; 
         }
+
+        if ($respostaModelo) {
+            Cache::put($cacheKey, $historico, 60 * 5); // Exemplo: manter por 5 minutos
+        }
+
+        return response()->json(['message' => $respostaModelo, 'history' => $historico]);
     }
     
     /**
