@@ -49,8 +49,6 @@ class GeminiAiClient
             }
 
         } catch (GuzzleException $e) {
-            // dd(json_encode(($payload)));
-            dd($e->getMessage());
             throw $e;
         }
     }
@@ -156,7 +154,7 @@ class GeminiAiClient
                                 'type' => 'string',
                             ],
                             'datetime' => [
-                                'type' => 'string',//
+                                'type' => 'string',
                             ],
                         ],
                         'required' => ['name','document','datetime'],
@@ -168,17 +166,14 @@ class GeminiAiClient
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
-                            'name' => [
-                                'type' => 'string',
-                            ],
-                            'document' => [
-                                'type' => 'string',
+                            'id' => [
+                                'type' => 'integer',
                             ],
                             'datetime' => [
                                 'type' => 'string',
                             ],
                         ],
-                        'required' => ['name','document','datetime'],
+                        'required' => ['id','datetime'],
                     ],
                 ],
                 [

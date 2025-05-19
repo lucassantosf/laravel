@@ -18,6 +18,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
     public function search(string $search)
     {
         $query = Appointment::query();
+        
+        $search = preg_replace('/[^a-zA-Z0-9]/', '', $search);
 
         if ($search) {
             $query->where(function ($q) use ($search) {

@@ -62,7 +62,7 @@ class AppointmentService implements AppointmentServiceInterface
         return $this->appointmentRepository->create($data);
     }
 
-    public function update(Request|array $data)
+    public function update(Request|array $data, int $id)
     {
         if ($data instanceof Request) {
             $data = $data->all();
@@ -72,20 +72,11 @@ class AppointmentService implements AppointmentServiceInterface
             throw new \InvalidArgumentException('O argumento deve ser uma instância de Request ou um array.');
         }
 
-        $name = $data['name'] ?? null;
-        $document = $data['document'] ?? null;
         $requestedDateTime = $data['datetime'] ?? null;
 
-        if (!$name && !$document) {
-            return response()->json(['message' => 'Nome ou documento do agendamento a ser alterado não informado.'], 400);
-        }
-
-        $search = $document ? $document : $name;
-
-        $resource = $this->appointmentRepository->search($search);
-
-        if (!$resource) {
-            return response()->json(['message' => 'Agendamento não encontrado com os dados fornecidos.'], 404);
+        $appointment = $this->appointmentRepository->find($id);
+        if (!$appointment) {
+            return response()->json(['message' => 'Agendamento não encontrado.'], 404);
         }
 
         $requestedDateTime = $data['datetime'] ?? null;
@@ -99,14 +90,14 @@ class AppointmentService implements AppointmentServiceInterface
         }
 
         // Pega todos os horários já agendados (excluindo o atual que estamos editando)
-        $bookedDatesQuery = $this->appointmentRepository->all()->where('id', '!=', $resource->id);//dd($bookedDatesQuery);
+        $bookedDatesQuery = $this->appointmentRepository->all()->where('id', '!=', $appointment->id);
         $bookedDates = $bookedDatesQuery->pluck('datetime')->toArray();
 
         if (in_array($requestedDateTime, $bookedDates)) {
             return response()->json(['message' => 'Novo horário já reservado.'], 409);
         }
 
-        return $this->appointmentRepository->update($data, $resource->id);
+        return $this->appointmentRepository->update($data, $appointment->id);
     }
 
     public function cancel(int $id)

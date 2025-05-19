@@ -13,4 +13,14 @@ class Appointment extends Model
         'name',
         'datetime', 
     ]; 
+
+    protected function setNameAttribute($name)
+    {
+        $this->attributes['name'] = trim(strip_tags($name ?? ''));
+    }   
+
+    protected function setDocumentAttribute($document)
+    {
+        $this->attributes['document'] = preg_replace('/\D/', '', $document); 
+    }   
 }
