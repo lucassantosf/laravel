@@ -1,29 +1,42 @@
-# Laravel Framework
+# Laravel Project Repository
 
-Este reposítório contém em cada pasta, os respectivos módulos referentes ao curso Completo de Laravel 5.8
+## Project Structure
 
-Disponível na [Udemy](https://www.udemy.com/course/laravelcompleto/)
- 
-# Requisitos de ambiente
- 
--Php 7.1+
- 
--[MSYQL/PHPMyADMIN WampServer](https://www.wampserver.com/en/)
+### Boilerplate V12 (`boilerplate_v12/`)
+A Laravel boilerplate project providing a robust starting point for building APIs with basic authentication. Key features include:
+- Basic user authentication system
+- Role and permission management
+- Dockerized development environment
+- Structured application layers (Controllers, Services, Repositories)
+- OAuth2 authentication support
+- Basic CRUD operations
+- Job queuing
+- Export functionality
+- Comprehensive testing setup
 
--[Composer](https://getcomposer.org/)
+#### Main Components:
+- **App**: Core application logic
+  - Controllers: Handle HTTP requests
+  - Models: Database interaction
+  - Services: Business logic
+  - Repositories: Data access abstraction
+  - Middleware: Request filtering and authentication
+- **Config**: Application configuration files
+- **Database**: Migrations, seeders, and factories
+- **Routes**: API and web route definitions
+- **Tests**: Feature and unit tests
+- **Environment**: Docker and deployment configurations
 
-## Como utilizar
+### Code Challenges (`code_challenges/`)
+A collection of PHP coding exercises designed to practice and improve programming skills. 
+- Contains individual PHP exercise files
+- Serves as a personal coding practice repository
+- Helps in exploring different programming concepts and problem-solving techniques
 
-Você pode navegar por qualquer pasta e:
+## Getting Started
+1. Clone the repository
+2. Navigate to the desired project directory
+3. Follow the specific README instructions in each project folder
 
-<ul>
-  <li>1) Renomear o arquivo ".env.example" para ".env" e configurar os campos APP_URL, DB_DATABASE, DB_USERNAME, DB_PASSWORD.</li>
-  <li>2) No terminal: "composer install" - Para que seja instalado todas as dependências do LARAVEL</li>
-  <li>3) "php artisan key:generate" - Para gerar sua chave da aplicação parar encriptar seus dados.</li>
-  <li>4) "npm install" - Para que seja instalado todas as dependências do WEBPACK</li>
-  <li>5) "php artisan migrate --seed" - Para que o criar todas as tabelas e colunas do banco de dados e popular com informações fake</li>
-  <li>6) "npm run watch" - Para monitorar alterações dos asssets (js/css). </li>  
-  <li>7) "npm run production" - Para compilar e minificar para produção</li>
-</ul>
-
- 
+## Contributing
+Feel free to explore, learn, and contribute to the projects.
