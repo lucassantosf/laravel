@@ -75,7 +75,6 @@ class OrderItem {
 
 class Order {
 
-    private float $subTotal;
     private int $userId;
     private bool $isPremiumUser;
     private array $itens;
