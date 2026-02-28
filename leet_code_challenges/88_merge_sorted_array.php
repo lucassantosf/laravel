@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 // Done at: 2026-02-24
 
@@ -40,15 +40,16 @@
 
 // Follow up: Can you come up with an algorithm that runs in O(m + n) time?
 
-function merge(&$nums1, $m, $nums2, $n) {
-    $tmp = array_slice($nums1, 0, $m); 
-    $nums2 = array_slice($nums2, 0, $n); 
-    $nums1 = array_merge($tmp,$nums2);
+function merge_(&$nums1, $m, $nums2, $n)
+{
+    $tmp = array_slice($nums1, 0, $m);
+    $nums2 = array_slice($nums2, 0, $n);
+    $nums1 = array_merge($tmp, $nums2);
     sort($nums1);
 }
 
 // $nums1 = [1,2,3,0,0,0]; $m=3; $nums2 = [2,5,6]; $n=3; // [1,2,2,3,5,6]
 // $nums1 = [1]; $m=1; $nums2 = []; $n=0; // [1]
 // $nums1 = [0]; $m=0; $nums2 = [1]; $n=1; // [1] 
-$result = merge($nums1, $m, $nums2, $n);
+$result = merge_($nums1, $m, $nums2, $n);
 var_dump($result);
