@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/ping', function () {
@@ -29,6 +30,11 @@ Route::group(['middleware' => ['auth:api', 'check_permission']], function () {
         Route::get('{id}', 'show')->name('show');
         Route::post('', 'store')->name('store');
         Route::post('{id}', 'update')->name('update');
+        Route::post('{id}/job', 'job')->name('job');
         Route::delete('{id}', 'destroy')->name('destroy');
+    });
+
+    Route::group(['prefix' => 'report', 'as' => 'report.', 'controller' => ReportController::class], function () {
+        Route::get('example', 'example')->name('example');
     });
 });

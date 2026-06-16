@@ -7,7 +7,7 @@
 - [OK] Security: ACL with Spatie Permission & Route-based Middleware
 - [OK] Architecture: Base Abstract Classes (Model, Repository, Service, Controller)
 - [OK] Implementation: Scalable CRUD Examples (Post & User)
-- [ ] Feature: Advanced Exports Example (Excel/PDF)
-- [ ] Automation: Queue/Job System (Redis driver)
-- [ ] Integration: External API Service Pattern
+- [OK] Feature: Advanced Exports Example (Excel/PDF)
+- [OK] Automation: Queue/Job System (Redis driver)
 - [ ] Schedule: Task Scheduling Workflows
+- [ ] Tests: Tests Coverage examples
