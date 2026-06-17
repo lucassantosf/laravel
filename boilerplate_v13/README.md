@@ -9,5 +9,5 @@
 - [OK] Implementation: Scalable CRUD Examples (Post & User)
 - [OK] Feature: Advanced Exports Example (Excel/PDF)
 - [OK] Automation: Queue/Job System (Redis driver)
-- [ ] Schedule: Task Scheduling Workflows
+- [OK] Schedule: Task Scheduling Workflows
 - [ ] Tests: Tests Coverage examples

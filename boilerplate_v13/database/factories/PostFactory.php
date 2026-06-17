@@ -24,7 +24,7 @@ class PostFactory extends Factory
             'user_id' => User::first()?->id ?? User::factory(),
             'title' => fake()->sentence(),
             'content' => fake()->paragraphs(3, true),
-            'status' => fake()->randomElement(['draft', 'published']),
+            'status' => true,
         ];
     }
 }
