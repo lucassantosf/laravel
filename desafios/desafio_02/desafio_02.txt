@@ -1,0 +1,71 @@
+====================================================================
+           DESAFIO 02: SISTEMA DE LOCADORA DE VEÍCULOS (POO Passo a Passo)
+====================================================================
+
+Objetivo: Construir um sistema simples de locadora de veículos aplicando
+Programação Orientada a Objetos (POO) em PHP de forma sequencial.
+Cada etapa depende diretamente da etapa anterior!
+
+--------------------------------------------------------------------
+PASSO A PASSO (SIGA NESTA ORDEM):
+--------------------------------------------------------------------
+
+Passo 1: A Exceção Customizada
+  Crie a classe de exceção `VeiculoIndisponivelException` estendendo a classe nativa `Exception`.
+  (Esta exceção será usada no passo 2 quando alguém tentar alugar um veículo já alugado).
+
+Passo 2: A Classe Base Abstrata (Veiculo)
+  Crie a classe abstrata `Veiculo` com:
+  - Propriedades protegidas: `modelo` (string), `placa` (string), `precoDiaria` (float) e `disponivel` (bool, iniciando em `true`).
+  - Construtor para receber modelo, placa e precoDiaria.
+  - Getters para modelo, placa, precoDiaria e o método `isDisponivel(): bool`.
+  - Método abstrato: `abstract public function calcularValorAluguel(int $dias): float;`
+  - Método `alugar(): void`: se `$disponivel` for `false`, lance a `VeiculoIndisponivelException`. Caso contrário, mude `$disponivel` para `false`.
+  - Método `devolver(): void`: mude `$disponivel` para `true`.
+
+Passo 3: Herança 1 (Carro)
+  Crie a classe `Carro` que herda de `Veiculo`:
+  - Adicione a propriedade privada `quantidadePortas` (int) e seu getter.
+  - Implemente o método `calcularValorAluguel(int $dias): float`:
+    Multiplique `$dias * $precoDiaria`. Se a `quantidadePortas` for igual a 4, adicione uma taxa fixa de R$ 20.00 ao total.
+
+Passo 4: Herança 2 (Moto)
+  Crie a classe `Moto` que herda de `Veiculo`:
+  - Adicione a propriedade privada `cilindradas` (int) e seu getter.
+  - Implemente o método `calcularValorAluguel(int $dias): float`:
+    Se `cilindradas` for maior que 200, dê um acréscimo de 10% sobre o valor da diária antes de multiplicar pelos dias.
+
+Passo 5: A Interface de Manutenção
+  Crie a interface `Manutenivel` com a assinatura:
+  `public function realizarManutencao(): string;`
+
+Passo 6: Implementação da Interface no Carro
+  Altere a classe `Carro` para que ela implemente a interface `Manutenivel`.
+  O método `realizarManutencao()` deve retornar a frase:
+  "Manutenção de rotina realizada no carro modelo {modelo}."
+
+Passo 7: A Classe Gerenciadora (Locadora)
+  Crie a classe `Locadora`:
+  - Propriedade privada `$veiculos` (array iniciado vazio).
+  - Método `adicionarVeiculo(Veiculo $veiculo): void` (adiciona no array).
+  - Método `buscarPorPlaca(string $placa): ?Veiculo` (percorre o array e retorna o veículo correspondente ou `null`).
+  - Método `listarDisponiveis(): array` (retorna um array apenas com os veículos cujo `isDisponivel()` seja `true`).
+
+Passo 8: Script Inicial de Teste (run.php)
+  Crie o arquivo `run.php`:
+  - Instancie a `Locadora`.
+  - Instancie 1 `Carro` (ex: Modelo "Gol", Placa "ABC-1234", Diária R$ 100.00, 4 portas).
+  - Instancie 1 `Moto` (ex: Modelo "CB 500", Placa "XYZ-9999", Diária R$ 80.00, 500cc).
+  - Adicione o carro e a moto na locadora.
+
+Passo 9: Executando Operações no Script (run.php)
+  No mesmo `run.php`:
+  - Busque o carro pela placa e imprima o valor do aluguel para 3 dias.
+  - Chame o método `alugar()` no carro.
+  - Chame o método `listarDisponiveis()` da locadora e imprima os modelos dos veículos disponíveis (agora só deve listar a moto).
+
+Passo 10: Testando o Tratamento de Exceção (run.php)
+  No mesmo `run.php`:
+  - Envolva uma nova chamada de `alugar()` no mesmo carro em um bloco `try / catch`.
+  - No bloco `catch (VeiculoIndisponivelException $e)`, imprima no terminal:
+    "Erro capturado com sucesso: " . $e->getMessage()

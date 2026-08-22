@@ -1,0 +1,69 @@
+====================================================================
+      DESAFIO 03: SISTEMA DE DISPARO DE NOTIFICAÇÕES (POO Passo a Passo)
+====================================================================
+
+Objetivo: Construir um sistema de envio de notificações multi-canal (E-mail e SMS)
+aplicando Programação Orientada a Objetos (POO) em PHP de forma sequencial.
+Cada mensagem possui seu canal alvo específico (E-mail ou SMS).
+
+--------------------------------------------------------------------
+PASSO A PASSO (REVISADO):
+--------------------------------------------------------------------
+
+Passo 1: A Exceção Customizada
+  Crie a classe de exceção `DestinatarioInvalidoException` estendendo a classe nativa `\Exception`.
+
+Passo 2: O DTO / Objeto de Valor (Mensagem)
+  Crie a classe `Mensagem`:
+  - Propriedades privadas com tipos explicitados: `destinatario` (string), `titulo` (string), `conteudo` (string) e `canalDesejado` (string).
+  - Construtor recebendo as 4 propriedades. Se `$destinatario` for uma string vazia (após trim), lance a `DestinatarioInvalidoException("O destinatário não pode ser vazio.")`.
+  - Getters para todas as 4 propriedades (`getDestinatario()`, `getTitulo()`, `getConteudo()`, `getCanalDesejado()`).
+
+Passo 3: A Interface do Canal de Envio
+  Crie a interface `CanalEnvioInterface` com as assinaturas:
+  - `public function enviar(Mensagem $mensagem): bool;`
+  - `public function getNomeCanal(): string;`
+
+Passo 4: Implementação 1 da Interface (CanalEmail)
+  Crie a classe `CanalEmail` que implementa `CanalEnvioInterface`:
+  - `getNomeCanal(): string`: retorna `"E-mail"`.
+  - `enviar(Mensagem $mensagem): bool`:
+    Verifique se o destinatário contém o caractere `'@'`.
+    Se NÃO contiver, lance a `DestinatarioInvalidoException("Endereço de e-mail inválido: " . $mensagem->getDestinatario())`.
+    Se for válido, imprima no terminal: `"[E-MAIL] Enviando '{titulo}' para {destinatario}..."` e retorne `true`.
+
+Passo 5: Implementação 2 da Interface (CanalSms)
+  Crie a classe `CanalSms` que implementa `CanalEnvioInterface`:
+  - `getNomeCanal(): string`: retorna `"SMS"`.
+  - `enviar(Mensagem $mensagem): bool`:
+    Verifique se o destinatário é um número de telefone válido. Se contiver `'@'`, lance `DestinatarioInvalidoException("Número de telefone inválido para SMS: " . $mensagem->getDestinatario())`.
+    Se o conteúdo da mensagem tiver mais de 160 caracteres, trunca nos primeiros 157 caracteres e adiciona `"..."`.
+    Imprima no terminal: `"[SMS] Enviando para {destinatario}: {conteudo_processado}"` e retorne `true`.
+
+Passo 6: A Trait de Auditoria (LogEnvioTrait)
+  Crie a trait `LogEnvioTrait`:
+  - Propriedade privada/protegida `array $historicoLogs = [];`.
+  - Método `registrarLog(string $canal, string $destinatario, string $status): void`.
+  - Método `getHistoricoLogs(): array`.
+
+Passo 7: O Gerenciador de Notificações (GerenciadorNotificacoes)
+  Crie a classe `GerenciadorNotificacoes` utilizando a `LogEnvioTrait`:
+  - Propriedade privada `array $canais = [];`.
+  - Método `registrarCanal(CanalEnvioInterface $canal): void`.
+  - Método `disparar(Mensagem $mensagem): void`:
+    Percorre os canais registrados. Se o nome do canal bater com `$mensagem->getCanalDesejado()`, executa o envio dentro de um `try / catch`:
+    - No `try`: chama `$canal->enviar($mensagem)` e registra log de `'SUCESSO'`.
+    - No `catch (DestinatarioInvalidoException $e)`: imprime a falha com quebra de linha (`PHP_EOL`) e registra log de `'FALHA'`.
+
+Passo 8: Script Principal (run.php)
+  No `run.php`:
+  - Instancie o `GerenciadorNotificacoes`, `CanalEmail` e `CanalSms`, e registre os canais.
+
+Passo 9: Testando Envios Direcionados (run.php)
+  - Crie uma mensagem de e-mail (canal `"E-mail"`) e uma mensagem de SMS (canal `"SMS"`).
+  - Dispare ambas e veja que cada uma é entregue exclusivamente em seu canal respectivo.
+
+Passo 10: Testando Exceção e Exibindo Logs (run.php)
+  - Crie uma mensagem com e-mail inválido (sem `@`) direcionada ao canal `"E-mail"`.
+  - Dispare e verifique o log de falha.
+  - Imprima o histórico de logs ao final do script.
