@@ -1,0 +1,95 @@
+====================================================================
+      DESAFIO 04: CHECKOUT & GATEWAY DE PAGAMENTO COM FALLBACK (POO)
+====================================================================
+
+Objetivo: Construir um sistema de processamento de checkout de e-commerce
+com suporte a múltiplos meios de pagamento (PIX, Cartão, Boleto),
+descontos automáticos, resiliência com Gateway de Fallback (redundância)
+e consolidação de métricas financeiras.
+
+--------------------------------------------------------------------
+PASSO A PASSO (SIGA NESTA ORDEM):
+--------------------------------------------------------------------
+
+Passo 1: As Exceções Customizadas
+  Crie a pasta `src/Exceptions/` e as duas classes de exceção estendendo `\Exception`:
+  - `SaldoInsuficienteException`: Usada para falhas de limite/saldo.
+  - `GatewayIndisponivelException`: Usada quando um gateway fora do ar precisa acionar o fallback.
+
+Passo 2: O Enum de Método de Pagamento (MetodoPagamento)
+  Crie o Enum `MetodoPagamento` (PHP 8.1+) em `src/Enums/MetodoPagamento.php` com os casos:
+  - `PIX`
+  - `CARTAO_CREDITO`
+  - `BOLETO`
+  Adicione o método no Enum: `public function obterTaxaServico(): float`
+  (PIX -> 0.0, CARTAO_CREDITO -> 0.03 [3%], BOLETO -> 2.50 [R$ 2.50 fixos]).
+
+Passo 3: O Objeto de Valor da Transação (Transacao)
+  Crie a classe `Transacao` em `src/Transacao.php`:
+  - Propriedades privadas: `id` (string), `valor` (float), `metodo` (MetodoPagamento), `simularFalha` (bool, default `false`) e `status` (string, default `'PENDENTE'`).
+  - Construtor para receber id, valor, metodo e simularFalha.
+  - Getters para todas as propriedades e Setters para `valor` e `status`.
+
+Passo 4: A Interface do Gateway (GatewayPagamentoInterface)
+  Crie a interface `GatewayPagamentoInterface` em `src/Interfaces/GatewayPagamentoInterface.php`:
+  - `public function processar(Transacao $transacao): bool;`
+  - `public function getNomeGateway(): string;`
+
+Passo 5: Implementação 1 - Gateway PIX (PixGateway)
+  Crie a classe `PixGateway` em `src/Gateways/PixGateway.php` implementando `GatewayPagamentoInterface`:
+  - `getNomeGateway(): string`: retorna `"Gateway PIX"`.
+  - `processar(Transacao $transacao): bool`:
+    Se o método da transação não for `MetodoPagamento::PIX`, lance `GatewayIndisponivelException("Este gateway processa apenas PIX.")`.
+    Aplica 5% de desconto no valor da transação (`$transacao->setValor($novoValor)`).
+    Define o status da transação como `'APROVADO'` e retorna `true`.
+
+Passo 6: Implementação 2 - Gateway de Cartão (CartaoCreditoGateway)
+  Crie a classe `CartaoCreditoGateway` em `src/Gateways/CartaoCreditoGateway.php` implementando `GatewayPagamentoInterface`:
+  - Propriedade privada `string $nome` (ex: "Stripe Principal" ou "Pagarme Fallback").
+  - Propriedade privada `bool $isPrincipal`.
+  - Construtor recebendo `$nome` e `$isPrincipal`.
+  - `getNomeGateway(): string`: retorna `$this->nome`.
+  - `processar(Transacao $transacao): bool`:
+    Se `$transacao->getSimularFalha()` for `true` E `$this->isPrincipal` for `true`, lance `GatewayIndisponivelException("Falha de conexão com o " . $this->nome)`.
+    Se o valor da transação for maior que 5000.00, lance `SaldoInsuficienteException("Limite de crédito excedido para valor R$ " . $transacao->getValor())`.
+    Define o status como `'APROVADO'` e retorna `true`.
+
+Passo 7: O Processador de Redundância (GatewayFallbackProcessor)
+  Crie a classe `GatewayFallbackProcessor` em `src/Processors/GatewayFallbackProcessor.php`:
+  - Propriedades privadas: `$gatewayPrincipal` e `$gatewaySecundario` (ambos `GatewayPagamentoInterface`).
+  - Construtor recebendo os dois gateways.
+  - Método `processarComFallback(Transacao $transacao): bool`:
+    Tenta processar no `$gatewayPrincipal`.
+    Se capturar `GatewayIndisponivelException`, imprime aviso: `"[AVISO] Gateway Principal indisponível! Acionando Fallback para {$gatewaySecundario->getNomeGateway()}..."` e executa no `$gatewaySecundario`.
+
+Passo 8: A Trait de Métricas Financeiras (MetricasPagamentoTrait)
+  Crie a trait `MetricasPagamentoTrait` em `src/Traits/MetricasPagamentoTrait.php`:
+  - Propriedades privadas: `float $totalAprovado = 0.0`, `float $totalRecusado = 0.0`, `int $qtdAprovadas = 0`, `int $qtdRecusadas = 0`.
+  - Método `registrarSucesso(float $valor): void` (soma no total e incrementa a quantidade).
+  - Método `registrarRecusa(float $valor): void` (soma no total e incrementa a quantidade).
+  - Método `getResumoMetricas(): array` (retorna array com todos os totais calculados).
+
+Passo 9: O Gerenciador de Checkout (CheckoutProcessor)
+  Crie a classe `CheckoutProcessor` em `src/CheckoutProcessor.php` usando a `MetricasPagamentoTrait`:
+  - Propriedades privadas: `GatewayFallbackProcessor $cartaoProcessor` e `PixGateway $pixGateway`.
+  - Construtor recebendo ambas as dependências.
+  - Método `processarCheckout(Transacao $transacao): void`:
+    Aplica a taxa de serviço do método de pagamento ao valor (`$transacao->getMetodo()->obterTaxaServico()`).
+    Em um bloco `try / catch`:
+      Se for PIX, executa `$this->pixGateway->processar($transacao)`.
+      Se for Cartão/Boleto, executa `$this->cartaoProcessor->processarComFallback($transacao)`.
+      No `try` bem-sucedido: imprime a aprovação e chama `$this->registrarSucesso($transacao->getValor())`.
+      No `catch (SaldoInsuficienteException | GatewayIndisponivelException $e)`: define status como `'RECUSADO'`, imprime o erro e chama `$this->registrarRecusa($transacao->getValor())`.
+
+Passo 10: Script de Demonstração e Relatório (run.php)
+  Crie o arquivo `run.php` com autoloader no namespace `Desafio04`:
+  - Instancie o `PixGateway`.
+  - Instancie dois `CartaoCreditoGateway`: um principal (com `$isPrincipal = true`) e um secundário (`$isPrincipal = false`).
+  - Instancie o `GatewayFallbackProcessor` com os dois gateways de cartão.
+  - Instancie o `CheckoutProcessor`.
+  - Crie e processe 3 transações:
+    1. Transação PIX (R$ 100.00) -> deve receber 5% de desconto e aprovar.
+    2. Transação Cartão Normal (R$ 250.00) -> deve aprovar no principal.
+    3. Transação Cartão com Falha Simulada (R$ 300.00, `simularFalha = true`) -> deve falhar no principal e ser APROVADA no gateway secundário via Fallback!
+    4. Transação Cartão com valor alto (R$ 6000.00) -> deve ser RECUSADA por limite excedido.
+  - Ao final, imprima o relatório consolidado de métricas financeiras (`getResumoMetricas()`)!
