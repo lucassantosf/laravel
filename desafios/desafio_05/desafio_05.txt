@@ -1,0 +1,106 @@
+====================================================================
+  DESAFIO 05: SISTEMA DE FILAS DE JOBS COM MIDDLEWARES & RETRY (POO)
+====================================================================
+
+Objetivo: Construir um sistema de processamento de tarefas em segundo plano (Queues & Jobs)
+com suporte a prioridades, simulação de retentativa (Retry), Dead Letter Queue (DLQ),
+esteira de Middlewares e estatísticas de execução.
+
+--------------------------------------------------------------------
+PASSO A PASSO (SIGA NESTA ORDEM):
+--------------------------------------------------------------------
+
+Passo 1: As Exceções Customizadas
+  Crie a pasta `src/Exceptions/` com 3 classes estendendo `\Exception`:
+  - `JobFalhouException`: Lançada quando a execução do Job encontra um erro de negócio.
+  - `MaxTentativasExcedidasException`: Lançada quando um Job estoura o limite de retentativas.
+  - `FilaVaziaException`: Lançada se tentar processar uma fila sem tarefas.
+
+Passo 2: Os Enums de Status e Prioridade
+  Crie os Enums (PHP 8.1+) na pasta `src/Enums/`:
+  - `StatusJob.php`: casos `PENDENTE`, `PROCESSANDO`, `CONCLUIDO`, `FALHOU`.
+  - `PrioridadeJob.php`: casos `ALTA` (valor 1), `MEDIA` (valor 2), `BAIXA` (valor 3).
+
+Passo 3: A Classe Abstrata de Job (JobAbstract)
+  Crie a classe abstrata `JobAbstract` em `src/JobAbstract.php`:
+  - Propriedades protegidas:
+    - `string $id`
+    - `PrioridadeJob $prioridade`
+    - `int $maxTentativas` (default: 3)
+    - `int $tentativaAtual` (default: 0)
+    - `StatusJob $status` (default: `StatusJob::PENDENTE`)
+  - Construtor recebendo id, prioridade e maxTentativas.
+  - Método abstrato: `abstract public function executar(): bool;`
+  - Métodos utilitários:
+    - `incrementarTentativa(): void` (soma 1 na tentativaAtual).
+    - `isMaxTentativasExcedidas(): bool` (retorna true se tentativaAtual >= maxTentativas).
+    - Getters/Setters para status, prioridade, id e tentativas.
+
+Passo 4: Implementação dos Jobs Concretos
+  Crie a pasta `src/Jobs/` com 2 classes estendendo `JobAbstract`:
+  - `EnviarEmailJob.php`:
+    - Propriedades: `string $destinatario`, `string $corpo`.
+    - `executar(): bool`: Se o destinatário não contiver `'@'`, lance `JobFalhouException("E-mail inválido: " . $destinatario)`. Imprima: `"[EMAIL] Enviado para {$destinatario}"` e retorne `true`.
+  - `GerarPdfJob.php`:
+    - Propriedades: `string $nomeArquivo`, `string $conteudo`.
+    - `executar(): bool`: Se o tamanho do conteúdo for menor que 5 caracteres (`strlen`), lance `JobFalhouException("Conteúdo muito curto para gerar PDF.")`. Imprima: `"[PDF] Arquivo {$nomeArquivo} gerado com sucesso."` e retorne `true`.
+
+Passo 5: A Interface de Middleware (JobMiddlewareInterface)
+  Crie a interface `JobMiddlewareInterface` em `src/Interfaces/JobMiddlewareInterface.php`:
+  - `public function processar(JobAbstract $job, callable $next): void;`
+
+Passo 6: Implementação do LoggingMiddleware
+  Crie a classe `LoggingMiddleware` em `src/Middlewares/LoggingMiddleware.php` implementando `JobMiddlewareInterface`:
+  - `processar(JobAbstract $job, callable $next): void`:
+    Imprima: `"[MIDDLEWARE LOG] Iniciando Job ID: {$job->getId()} [Prioridade: {$job->getPrioridade()->name}]..."`.
+    Chame `$next($job);`.
+    Imprima: `"[MIDDLEWARE LOG] Finalizado Job ID: {$job->getId()} [Status: {$job->getStatus()->name}]"`.
+
+Passo 7: A Trait de Estatísticas (EstatisticasFilaTrait)
+  Crie a trait `EstatisticasFilaTrait` em `src/Traits/EstatisticasFilaTrait.php`:
+  - Propriedades privadas: `int $jobsConcluidos = 0`, `int $jobsRetriados = 0`, `int $jobsDeadLetter = 0`.
+  - Métodos incrementadores: `incrementarConcluido()`, `incrementarRetry()`, `incrementarDeadLetter()`.
+  - Método `getResumoEstatisticas(): array` (retorna o resumo acumulado).
+
+Passo 8: O Gerenciador de Fila - Estrutura (QueueWorker)
+  Crie a classe `QueueWorker` em `src/QueueWorker.php` utilizando a `EstatisticasFilaTrait`:
+  - Propriedades privadas: `array $fila = []`, `array $deadLetterQueue = []`, `array $middlewares = []`.
+  - Método `push(JobAbstract $job): void` (adiciona o job na fila).
+  - Método `adicionarMiddleware(JobMiddlewareInterface $middleware): void`.
+  - Método `getDeadLetterQueue(): array` (retorna a lista de jobs mortos).
+
+Passo 9: O Algoritmo de Processamento com Retry e DLQ (QueueWorker)
+  Em `QueueWorker.php`, crie o método `processarFila(): void`:
+  - Se a `$fila` estiver vazia, lance `FilaVaziaException("A fila está vazia.")`.
+
+  - Ordene a `$fila` com base na prioridade do Job (`ALTA` primeiro, ou seja, menor valor ordinal do Enum).
+  
+  - Enquanto houver jobs na `$fila`:
+    - Retire o primeiro job da fila (`array_shift`).
+    - Monte a execução dos middlewares e execute a ação principal dentro do bloco `try / catch`:
+    - No `try`:
+      - Atualize status para `PROCESSANDO`.
+      - Execute o job passando pelo middleware (ou chamando `$job->executar()`).
+      - Atualize status para `CONCLUIDO` e chame `$this->incrementarConcluido()`.
+    - No `catch (JobFalhouException $e)`:
+      - Chame `$job->incrementarTentativa()`.
+      - Se `$job->isMaxTentativasExcedidas()`:
+        - Atualize status para `FALHOU`.
+        - Adicione o job no array `$deadLetterQueue`.
+        - Imprima aviso: `"[DLQ] Job ID: {$job->getId()} excedeu o limite de {$job->getMaxTentativas()} tentativas e foi enviado para a Dead Letter Queue. Erro: {$e->getMessage()}"`.
+        - Chame `$this->incrementarDeadLetter()`.
+      - Senão:
+        - Imprima aviso: `"[RETRY] Tentativa {$job->getTentativaAtual()}/{$job->getMaxTentativas()} falhou para o Job ID: {$job->getId()}. Devolvendo para a fila..."`.
+        - Devolva o job para o final da `$fila` (`$this->fila[] = $job`).
+        - Chame `$this->incrementarRetry()`.
+
+Passo 10: Script Principal e Relatório de Auditoria (run.php)
+  Crie o arquivo `run.php` com autoloader no namespace `Desafio05`:
+  - Instancie o `QueueWorker` e adicione o `LoggingMiddleware`.
+  - Crie e adicione na fila 4 jobs:
+    1. `EnviarEmailJob` válido (Prioridade `MEDIA`) -> deve aprovar de primeira.
+    2. `GerarPdfJob` válido (Prioridade `ALTA`) -> deve ser processado ANTES do e-mail por causa da prioridade ALTA!
+    3. `EnviarEmailJob` com e-mail sem `@` (Prioridade `BAIXA`, maxTentativas = 2) -> deve falhar, tentar o retry e ir para a Dead Letter Queue após 2 tentativas.
+    4. `GerarPdfJob` com conteúdo de 2 letras (Prioridade `MEDIA`, maxTentativas = 2) -> deve falhar e ir para a Dead Letter Queue.
+  - Chame `processarFila()`.
+  - Imprima os jobs presentes na Dead Letter Queue (`getDeadLetterQueue()`) e o resumo final de estatísticas (`getResumoEstatisticas()`)!
