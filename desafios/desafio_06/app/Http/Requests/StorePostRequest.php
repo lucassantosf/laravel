@@ -14,7 +14,7 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|min:5|unique:posts,titulo',
+            'title' => 'required|string|min:5|unique:posts,title',
             'content' => 'required|string|min:10',
             'is_published' => 'boolean',
         ];

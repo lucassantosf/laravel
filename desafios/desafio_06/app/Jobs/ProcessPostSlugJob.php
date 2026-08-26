@@ -5,10 +5,11 @@ namespace App\Jobs;
 use App\Models\Post;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\SerializesModels;
 
 class ProcessPostSlugJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
     public Post $post;
 

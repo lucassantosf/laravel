@@ -13,7 +13,7 @@ class Post extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['title', 'content'];
+    protected $fillable = ['title', 'content', 'is_published', 'user_id'];
 
     public function user(): BelongsTo
     {
@@ -27,6 +27,6 @@ class Post extends Model
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('published', true);
+        return $query->where('is_published', true);
     }
 }
