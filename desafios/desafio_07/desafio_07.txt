@@ -1,0 +1,144 @@
+====================================================================
+  DESAFIO 07: MOTOR DE ORQUESTRAÇÃO DE WORKFLOWS & SAGA PATTERN (POO)
+====================================================================
+
+Objetivo: Construir um motor de transações distribuídas baseado no padrão
+Orchestrator Saga Pattern (Máquina de Estados de Workflow com Rollback de Compensação).
+O sistema executa uma sequência de passos (Steps). Se algum passo falhar durante o fluxo,
+o orquestrador interrompe a execução e dispara ações de compensação em ordem
+inversa (LIFO - Last In, First Out) nos passos anteriormente concluídos,
+garantindo a integridade e reversão do estado do sistema.
+
+--------------------------------------------------------------------
+PASSO A PASSO (SIGA NESTA ORDEM):
+--------------------------------------------------------------------
+
+Passo 1: As Exceções Customizadas
+  Crie a pasta `src/Exceptions/` com 3 classes estendendo `\Exception`:
+  - `SagaExecucaoException`: Lançada quando um passo da Saga falhar em sua execução.
+  - `SagaCompensacaoException`: Lançada quando a ação de compensação de um passo falhar.
+  - `WorkflowInvalidoException`: Lançada se tentar executar um workflow sem nenhum passo cadastrado.
+
+Passo 2: Os Enums de Estado
+  Crie os Enums (PHP 8.1+) na pasta `src/Enums/`:
+  - `EstadoSaga.php`: casos `NAO_INICIADO`, `EM_EXECUCAO`, `SUCESSO`, `FALHOU`, `EM_COMPENSACAO`, `COMPENSADO`.
+  - `StatusStep.php`: casos `PENDENTE`, `SUCESSO`, `FALHOU`, `COMPENSADO`.
+
+Passo 3: A Classe de Contexto Compartilhado (SagaContext)
+  Crie a classe `SagaContext` em `src/SagaContext.php`:
+  - Propriedade privada: `array $dados = []`.
+  - Métodos utilitários de manipulação de estado:
+    - `set(string $chave, mixed $valor): void`
+    - `get(string $chave, mixed $default = null): mixed`
+    - `has(string $chave): bool`
+    - `all(): array`
+
+Passo 4: A Interface do Passo da Saga (SagaStepInterface)
+  Crie a interface `SagaStepInterface` em `src/Interfaces/SagaStepInterface.php`:
+  - `public function getNome(): string;`
+  - `public function executar(SagaContext $context): bool;`
+  - `public function compensar(SagaContext $context): void;`
+
+Passo 5: Implementação dos Steps Concretos
+  Crie a pasta `src/Steps/` com 4 classes implementando `SagaStepInterface`:
+
+  - `ReservarEstoqueStep.php`:
+    - `getNome()`: retorna `"Reservar Estoque"`.
+    - `executar()`: adiciona `'estoque_reservado' => true` no contexto. Imprime: `"[STEP OK] Estoque reservado para o pedido."`. Retorna `true`.
+    - `compensar()`: altera `'estoque_reservado' => false` no contexto. Imprime: `"[COMPENSAÇÃO] Reserva de estoque cancelada/devolvida."`.
+
+  - `ProcessarPagamentoStep.php`:
+    - Propriedade privada: `float $valorMinimo`.
+    - Construtor recebendo `$valorMinimo = 10.0`.
+    - `getNome()`: retorna `"Processar Pagamento"`.
+    - `executar()`: pega `'valor_pedido'` do contexto. Se o valor for menor que `$valorMinimo` ou não existir no contexto, lança `SagaExecucaoException("Pagamento recusado: valor abaixo do mínimo permitido de R$ {$this->valorMinimo}")`. Senão grava `'pagamento_aprovado' => true` no contexto. Imprime: `"[STEP OK] Pagamento processado com sucesso."`. Retorna `true`.
+    - `compensar()`: altera `'pagamento_aprovado' => false` no contexto. Imprime: `"[COMPENSAÇÃO] Pagamento estornado ao cliente."`.
+
+  - `EmitirNotaFiscalStep.php`:
+    - `getNome()`: retorna `"Emitir Nota Fiscal"`.
+    - `executar()`: se o contexto tiver a chave `'simular_falha_fiscal'` igual a `true`, lança `SagaExecucaoException("SEFAZ indisponível. Falha na emissão da NF.")`. Senão grava `'nota_fiscal_id' => 'NF-998877'` no contexto. Imprime: `"[STEP OK] Nota Fiscal NF-998877 emitida."`. Retorna `true`.
+    - `compensar()`: remove `'nota_fiscal_id'` do contexto. Imprime: `"[COMPENSAÇÃO] Nota Fiscal cancelada junto à SEFAZ."`.
+
+  - `EnviarNotificacaoStep.php`:
+    - `getNome()`: retorna `"Enviar Notificação"`.
+    - `executar()`: grava `'notificacao_enviada' => true` no contexto. Imprime: `"[STEP OK] Notificação de confirmação enviada ao cliente."`. Retorna `true`.
+    - `compensar()`: insere `'notificacao_cancelamento_enviada' => true` no contexto. Imprime: `"[COMPENSAÇÃO] E-mail de aviso de cancelamento enviado ao cliente."`.
+
+Passo 6: A Trait de Trilha de Auditoria (AuditoriaSagaTrait)
+  Crie a trait `AuditoriaSagaTrait` em `src/Traits/AuditoriaSagaTrait.php`:
+  - Propriedades privadas: `array $trilhaAuditoria = []`.
+  - Método `registrarEvento(string $stepNome, string $acao, string $detalhe = ''): void` (adiciona registro com timestamp, nome do step, ação 'EXECUCAO' ou 'COMPENSACAO' e detalhe).
+  - Método `getTrilhaAuditoria(): array` (retorna todos os registros).
+
+Passo 7: O Orquestrador da Saga (SagaOrchestrator)
+  Crie a classe `SagaOrchestrator` em `src/SagaOrchestrator.php` usando `AuditoriaSagaTrait`:
+  - Propriedades privadas:
+    - `array $steps = []`
+    - `EstadoSaga $estado` (inicia com `EstadoSaga::NAO_INICIADO`)
+    - `array $stepsConcluidos = []` (pilha de passos que foram executados com sucesso)
+  - Método `adicionarStep(SagaStepInterface $step): self` (adiciona o step na lista `$steps`).
+  - Método `getEstado(): EstadoSaga`.
+  - Método `run(SagaContext $context): bool`:
+    - Se `$steps` estiver vazio, lança `WorkflowInvalidoException("Nenhum passo foi registrado no workflow.")`.
+    - Altera `$estado` para `EstadoSaga::EM_EXECUCAO`.
+    - Percorra a lista de `$steps`:
+      - Dentro de um bloco `try / catch (\Throwable $e)`:
+        - Executa `$step->executar($context)`.
+        - Adiciona o `$step` no INÍCIO do array `$stepsConcluidos` (`array_unshift($this->stepsConcluidos, $step)`), preparando a ordem LIFO de compensação.
+        - Registra na auditoria: `registrarEvento($step->getNome(), 'EXECUCAO', 'Sucesso')`.
+      - No `catch`:
+        - Altera `$estado` para `EstadoSaga::FALHOU`.
+        - Registra na auditoria: `registrarEvento($step->getNome(), 'EXECUCAO', 'FALHA: ' . $e->getMessage())`.
+        - Imprime mensagem de alerta: `"[ERRO SAGA] Falha no passo '{$step->getNome()}': {$e->getMessage()}"`.
+        - Dispara a compensação chamando `$this->executarCompensacao($context)`.
+        - Retorna `false`.
+    - Se todos os passos executarem com sucesso, altera `$estado` para `EstadoSaga::SUCESSO` e retorna `true`.
+
+Passo 8: O Algoritmo de Compensação LIFO (SagaOrchestrator)
+  Em `SagaOrchestrator.php`, crie o método privado `executarCompensacao(SagaContext $context): void`:
+  - Altera `$estado` para `EstadoSaga::EM_COMPENSACAO`.
+  - Imprime destaque: `"\n--- INICIANDO COMPENSAÇÃO DE SAGA (ROLLBACK EM ORDEM INVERSA) ---"`.
+  - Percorra a pilha `$this->stepsConcluidos`:
+    - Dentro de um bloco `try / catch (\Throwable $e)`:
+      - Executa `$step->compensar($context)`.
+      - Registra na auditoria: `registrarEvento($step->getNome(), 'COMPENSACAO', 'Revertido')`.
+    - No `catch`:
+      - Lança `SagaCompensacaoException("Erro crítico na compensação do passo '{$step->getNome()}': " . $e->getMessage())`.
+  - Ao final do loop, altera `$estado` para `EstadoSaga::COMPENSADO`.
+  - Imprime: `"--- COMPENSAÇÃO DE SAGA CONCLUÍDA COM SUCESSO ---\n"`.
+
+Passo 9: O Fluent Builder (WorkflowBuilder)
+  Crie a classe `WorkflowBuilder` em `src/WorkflowBuilder.php`:
+  - Propriedade privada: `SagaOrchestrator $orchestrator`.
+  - Construtor privado que instancia `$this->orchestrator = new SagaOrchestrator()`.
+  - Método estático `criar(): self` (retorna uma nova instância do `WorkflowBuilder`).
+  - Método `addStep(SagaStepInterface $step): self` (chama `$this->orchestrator->adicionarStep($step)` e retorna `$this`).
+  - Método `build(): SagaOrchestrator` (retorna a instância configurada do `$orchestrator`).
+
+Passo 10: Executável e Testes de Cenários de Negócio (run.php)
+  Crie o arquivo `run.php` com autoloader PSR-4 para o namespace `Desafio07`:
+
+  --- CENÁRIO 1: FLUXO FELIZ (SUCESSO TOTAL) ---
+  - Instancie o contexto `$context1 = new SagaContext()`.
+  - Defina no contexto: `'valor_pedido' => 150.00`.
+  - Monte o workflow usando o `WorkflowBuilder::criar()`:
+    1. `ReservarEstoqueStep`
+    2. `ProcessarPagamentoStep(10.0)`
+    3. `EmitirNotaFiscalStep`
+    4. `EnviarNotificacaoStep`
+  - Execute `run($context1)`.
+  - Imprima o Estado Final da Saga (deve ser `SUCESSO`).
+  - Imprima todos os dados gravados no `$context1->all()`.
+
+  --- CENÁRIO 2: FLUXO DE FALHA E ROLLBACK COMPENSATÓRIO ---
+  - Instancie o contexto `$context2 = new SagaContext()`.
+  - Defina no contexto: `'valor_pedido' => 150.00` e `'simular_falha_fiscal' => true`.
+  - Monte exatamente o mesmo workflow usando o `WorkflowBuilder`.
+  - Execute `run($context2)`.
+  - Observe a ordem das mensagens no terminal:
+    - Passos 1 e 2 executam com sucesso.
+    - Passo 3 (Nota Fiscal) lança a exceção!
+    - O Orquestrador intercepta a falha e aciona o Rollback.
+    - A compensação é executada na ORDEM INVERSA: Passo 2 (Estornar Pagamento) e depois Passo 1 (Cancelar Reserva de Estoque).
+  - Imprima o Estado Final da Saga (deve ser `COMPENSADO`).
+  - Imprima o relatório da Trilha de Auditoria (`getTrilhaAuditoria()`) comprovando todo o rastreamento!
