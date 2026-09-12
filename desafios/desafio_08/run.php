@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 spl_autoload_register(function ($class) {
-    $prefix = 'Desafio07\\';
+    $prefix = 'Desafio08\\';
     $baseDir = __DIR__ . '/src/';
 
     $len = strlen($prefix);

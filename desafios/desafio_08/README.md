@@ -41,7 +41,7 @@ Crie os Enums (PHP 8.1+) na pasta `src/Enums/`:
 
 ---
 
-### [*] Passo 3: O DTO do Evento (Evento)
+### [OK] Passo 3: O DTO do Evento (Evento)
 Crie a classe `Evento` em `src/Evento.php`:
 - Propriedades privadas:
   - `string $id`
@@ -59,7 +59,7 @@ Crie a classe `Evento` em `src/Evento.php`:
 
 ---
 
-### [*] Passo 4: A Interface do Handler (HandlerEventoInterface)
+### [OK] Passo 4: A Interface do Handler (HandlerEventoInterface)
 Crie a interface `HandlerEventoInterface` em `src/Interfaces/HandlerEventoInterface.php`:
 - `public function getNome(): string;`
 - `public function getTopicoDeInteresse(): string;` (aceita wildcard `*`, ex: `order.*`)
@@ -68,7 +68,7 @@ Crie a interface `HandlerEventoInterface` em `src/Interfaces/HandlerEventoInterf
 
 ---
 
-### [*] Passo 5: Implementação dos Handlers Concretos
+### [OK] Passo 5: Implementação dos Handlers Concretos
 Crie a pasta `src/Handlers/` com 4 classes implementando `HandlerEventoInterface`:
 
 - `AtualizarEstoqueHandler.php`:
