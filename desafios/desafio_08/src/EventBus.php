@@ -8,6 +8,8 @@ use Desafio08\Traits\MetricasEventBusTrait;
 use Desafio08\Outbox\OutboxStore;
 use Desafio08\Interfaces\HandlerEventoInterface;
 use Desafio08\Exceptions\TopicoInvalidoException;
+use Desafio08\Exceptions\EventoFalhouException;
+use Desafio08\Exceptions\SemHandlerException;
 use Desafio08\Enums\StatusEvento;
 use Desafio08\Outbox\OutboxMessage;
  
@@ -38,7 +40,6 @@ class EventBus{
     }
 
     public function publicar(Evento $evento): void{
-s
         if (empty(trim($evento->getTopico()))) {
             throw new TopicoInvalidoException("O tópico do evento não pode ser vazio.");            
         }
@@ -60,22 +61,51 @@ s
             throw new SemHandlerException("Nenhum handler registrado para o tópico " . $evento->getTopico());
         }
 
+        // 3. Ordenação: ordene os handlers encontrados por `getPrioridade()` (crescente).
+        usort(
+            $handlersCompativeis,
+            fn(HandlerEventoInterface $a, HandlerEventoInterface $b) => $a->getPrioridade() <=> $b->getPrioridade()
+        );
+
+        foreach($handlersCompativeis as $handler){
+            while (true) {
+
+                try {
+
+                    $evento->setStatus(StatusEvento::PROCESSANDO);
+                    $handler->processar($evento);
+                    $this->incrementarHandlerExecutado();
+
+                    $evento->setStatus(StatusEvento::PROCESSADO);
+                    $this->outbox->marcarComoEnviado($evento->getId());
+
+                    break; // Sucesso: sai do loop e vai para o próximo handler
+                } catch (EventoFalhouException $e) {
+
+                    $this->incrementarHandlerFalhou();
+                    $evento->incrementarTentativa();
+
+                    echo PHP_EOL."[ERRO] Handler '{$handler->getNome()}' falhou para o evento {$evento->getId()}: {$e->getMessage()} (Tentativa {$evento->getTentativas()}/{$this->maxTentativas})".PHP_EOL;
+
+                    if($evento->isMaxTentativasExcedidas($this->maxTentativas)){
+                        $evento->setStatus(StatusEvento::FALHOU);
+                        $this->outbox->marcarComoFalhou($evento->getId());
+                        $this->adicionarDeadLetter($evento);
+                        $this->incrementarDeadLetter();
+
+                        echo PHP_EOL."[DLQ] Evento {$evento->getId()} excedeu {$this->maxTentativas} tentativas e foi enviado para a Dead Letter Queue.".PHP_EOL;
+                        break; // Limite excedido: enviado para DLQ e encerra o retry deste handle
+
+                    }else{
+                        echo PHP_EOL."[RETRY] Evento {$evento->getId()} será reprocessado nas próximas tentativas...".PHP_EOL;
+                        $this->incrementarReenfileirado();
+
+                    }
+
+                }
+
+            }
+        }
+
     }
 }
-// - **Ordenação**: ordene os handlers encontrados por `getPrioridade()` (crescente).
-// - **Execução com Retry**: para cada handler, dentro de um bloco `try / catch (EventoFalhouException $e)`:
-//   - No `try`:
-//     - Atualize o status do evento para `PROCESSANDO`.
-//     - Execute `$handler->processar($evento)` e chame `incrementarHandlerExecutado()`.
-//     - Atualize o status para `PROCESSADO` e marque a mensagem do Outbox como `'ENVIADO'`.
-//   - No `catch`:
-//     - Chame `incrementarHandlerFalhou()`.
-//     - Chame `$evento->incrementarTentativa()`.
-//     - Imprima o aviso: `"[ERRO] Handler '{nome}' falhou para o evento {id}: {mensagem} (Tentativa {tentativa}/{maxTentativas})"`.
-//     - Se `$evento->isMaxTentativasExcedidas($this->maxTentativas)`:
-//       - Defina o status do evento como `FALHOU`.
-//       - Marque a mensagem do Outbox como `'FALHOU'`.
-//       - Adicione o evento na DLQ (`adicionarDeadLetter($evento)`) e chame `incrementarDeadLetter()`.
-//       - Imprima o aviso: `"[DLQ] Evento {id} excedeu {maxTentativas} tentativas e foi enviado para a Dead Letter Queue."`.
-//     - Senão:
-//       - Imprima `"[RETRY] Evento {id} será reprocessado nas próximas tentativas..."` e chame `incrementarReenfileirado()`.

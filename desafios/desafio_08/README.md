@@ -105,7 +105,7 @@ Crie a pasta `src/Handlers/` com 4 classes implementando `HandlerEventoInterface
 
 ---
 
-### [*] Passo 6: O Padrão Outbox (OutboxMessage e OutboxStore)
+### [OK] Passo 6: O Padrão Outbox (OutboxMessage e OutboxStore)
 Crie a pasta `src/Outbox/`:
 
 - `OutboxMessage.php`:
@@ -122,7 +122,7 @@ Crie a pasta `src/Outbox/`:
 
 ---
 
-### [*] Passo 7: A Trait de Métricas (MetricasEventBusTrait)
+### [OK] Passo 7: A Trait de Métricas (MetricasEventBusTrait)
 Crie a trait `MetricasEventBusTrait` em `src/Traits/MetricasEventBusTrait.php`:
 - Propriedades privadas:
   - `int $eventosPublicados = 0`
@@ -139,7 +139,7 @@ Crie a trait `MetricasEventBusTrait` em `src/Traits/MetricasEventBusTrait.php`:
 
 ---
 
-### [*] Passo 8: O Barramento de Eventos — Estrutura (EventBus)
+### [OK] Passo 8: O Barramento de Eventos — Estrutura (EventBus)
 Crie a classe `EventBus` em `src/EventBus.php` (namespace `Desafio08`) utilizando a
 `MetricasEventBusTrait`:
 - Propriedades privadas:
@@ -155,7 +155,7 @@ Crie a classe `EventBus` em `src/EventBus.php` (namespace `Desafio08`) utilizand
 
 ---
 
-### [*] Passo 9: O Algoritmo de Publicação com Outbox, Retry e DLQ (EventBus)
+### [OK] Passo 9: O Algoritmo de Publicação com Outbox, Retry e DLQ (EventBus)
 Em `EventBus.php`, crie o método `publicar(Evento $evento): void`:
 - **Validação**: se `trim($evento->getTopico())` estiver vazio, lance `TopicoInvalidoException("O tópico do evento não pode ser vazio.")`.
 - **Persistência no Outbox**: adicione o evento no Outbox com estado `'PENDENTE'` e chame `incrementarPublicado()`.

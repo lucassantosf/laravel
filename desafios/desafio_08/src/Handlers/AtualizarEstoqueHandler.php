@@ -25,10 +25,10 @@ class AtualizarEstoqueHandler implements HandlerEventoInterface{
     public function processar(Evento $evento): bool{
         $payload = $evento->getPayload();
 
-        $produto = $payload['produto'];
-
         if(!empty($payload['simular_falha']))
-            throw new EventoFalhouException("Estoque indisponível para o produto " . $produto);
+            throw new EventoFalhouException("Estoque indisponível para o produto ");
+
+        $produto = $payload['produto'];
             
         echo PHP_EOL."[HANDLER OK] Estoque reservado para o produto {$produto}.".PHP_EOL;
         return true;
